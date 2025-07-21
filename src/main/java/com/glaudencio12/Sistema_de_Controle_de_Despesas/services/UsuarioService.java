@@ -3,6 +3,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.UserNotFound;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
@@ -12,23 +13,66 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class UsuarioService {
     private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class.getName());
 
-    @Autowired
-    private UsuarioRepository repository;
+    private final UsuarioRepository repository;
 
-    public UsuarioResponseDTO createUser(UsuarioRequestDTO usuario){
+    public UsuarioService(UsuarioRepository repository) {
+        this.repository = repository;
+    }
+
+    public UsuarioResponseDTO createUser(UsuarioRequestDTO usuario) {
         logger.info("Iniciando cadastro de usuário com email: {}", usuario.getEmail());
-        Usuario usuariCadastrado = repository.findByEmail(usuario.getEmail());
-        if (usuariCadastrado != null) {
+        Usuario emailUsuarioCadastrado = repository.findByEmail(usuario.getEmail());
+
+        if (emailUsuarioCadastrado != null) {
             throw new EmailCannotBeDuplicatedException("O email fornecido já está cadastrado na base de dados");
-        }else {
+        } else {
             usuario.setDataCadastro(LocalDate.now());
             Usuario entidade = repository.save(ObjectMapper.parseObject(usuario, Usuario.class));
             return ObjectMapper.parseObject(entidade, UsuarioResponseDTO.class);
         }
+    }
+
+    public UsuarioResponseDTO findUserById(Long id) {
+        logger.info("Buscando usuário de ID: {}", id);
+        Usuario usuario = repository.findById(id).orElseThrow(() -> new UserNotFound("Usuário não encontrado"));
+        return ObjectMapper.parseObject(usuario, UsuarioResponseDTO.class);
+    }
+
+    public List<UsuarioResponseDTO> findAllUsers() {
+        logger.info("Buscando todos os usuários do banco");
+        List<Usuario> usuarios = repository.findAll();
+        if (usuarios.isEmpty()) {
+            throw new UserNotFound("Nenhum usuário encontrada no banco de dados");
+        } else {
+            return ObjectMapper.parseObjects(usuarios, UsuarioResponseDTO.class);
+        }
+    }
+
+    public UsuarioResponseDTO updateUserById(Long id, UsuarioRequestDTO usuarioRequest) {
+        logger.info("Atualizando os dados do usuário de id {}", id);
+        Usuario emailUsuarioCadastrado = repository.findByEmail(usuarioRequest.getEmail());
+
+        if (emailUsuarioCadastrado != null) {
+            throw new EmailCannotBeDuplicatedException("O email fornecido já está cadastrado na base de dados");
+        } else {
+            Usuario usuario = repository.findById(id).orElseThrow(() -> new UserNotFound("Usuário não encontrado"));
+
+            usuario.setNome(usuarioRequest.getNome().trim());
+            usuario.setEmail(usuarioRequest.getEmail().trim());
+            usuario.setSenha(usuarioRequest.getSenha().trim());
+            return ObjectMapper.parseObject(repository.save(usuario), UsuarioResponseDTO.class);
+        }
+    }
+
+    public void deleteUserById(Long id) {
+        logger.info("Excluindo o usuário de id {} do banco de dados", id);
+        Usuario usuario = repository.findById(id).orElseThrow(() -> new UserNotFound("Usuário não encontrado"));
+        repository.delete(usuario);
     }
 }
