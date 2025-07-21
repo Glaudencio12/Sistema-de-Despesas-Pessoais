@@ -7,9 +7,9 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.UserNotFound;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,9 +20,11 @@ public class UsuarioService {
     private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class.getName());
 
     private final UsuarioRepository repository;
+    private final HateoasLinks linksHateoas;
 
-    public UsuarioService(UsuarioRepository repository) {
+    public UsuarioService(UsuarioRepository repository, HateoasLinks links) {
         this.repository = repository;
+        this.linksHateoas = links;
     }
 
     public UsuarioResponseDTO createUser(UsuarioRequestDTO usuario) {
@@ -34,14 +36,18 @@ public class UsuarioService {
         } else {
             usuario.setDataCadastro(LocalDate.now());
             Usuario entidade = repository.save(ObjectMapper.parseObject(usuario, Usuario.class));
-            return ObjectMapper.parseObject(entidade, UsuarioResponseDTO.class);
+            UsuarioResponseDTO dto = ObjectMapper.parseObject(entidade, UsuarioResponseDTO.class);
+            linksHateoas.links(dto);
+            return dto;
         }
     }
 
     public UsuarioResponseDTO findUserById(Long id) {
         logger.info("Buscando usuário de ID: {}", id);
         Usuario usuario = repository.findById(id).orElseThrow(() -> new UserNotFound("Usuário não encontrado"));
-        return ObjectMapper.parseObject(usuario, UsuarioResponseDTO.class);
+        UsuarioResponseDTO dto = ObjectMapper.parseObject(usuario, UsuarioResponseDTO.class);
+        linksHateoas.links(dto);
+        return dto;
     }
 
     public List<UsuarioResponseDTO> findAllUsers() {
@@ -50,7 +56,9 @@ public class UsuarioService {
         if (usuarios.isEmpty()) {
             throw new UserNotFound("Nenhum usuário encontrada no banco de dados");
         } else {
-            return ObjectMapper.parseObjects(usuarios, UsuarioResponseDTO.class);
+            List<UsuarioResponseDTO> dtos = ObjectMapper.parseObjects(usuarios, UsuarioResponseDTO.class);
+            dtos.forEach(linksHateoas::links);
+            return dtos;
         }
     }
 
@@ -66,7 +74,9 @@ public class UsuarioService {
             usuario.setNome(usuarioRequest.getNome().trim());
             usuario.setEmail(usuarioRequest.getEmail().trim());
             usuario.setSenha(usuarioRequest.getSenha().trim());
-            return ObjectMapper.parseObject(repository.save(usuario), UsuarioResponseDTO.class);
+            UsuarioResponseDTO dto = ObjectMapper.parseObject(repository.save(usuario), UsuarioResponseDTO.class);
+            linksHateoas.links(dto);
+            return dto;
         }
     }
 
