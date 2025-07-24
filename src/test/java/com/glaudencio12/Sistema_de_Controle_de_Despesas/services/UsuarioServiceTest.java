@@ -3,7 +3,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.UserNotFound;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.mocks.MockUsuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
@@ -186,7 +186,7 @@ class UsuarioServiceTest {
         void lanca_uma_excecao_se_nenhum_usuario_for_encontrado() {
             when(repository.findAll()).thenReturn(List.of());
 
-            Exception ex = assertThrows(UserNotFound.class, () ->
+            Exception ex = assertThrows(NotFoundException.class, () ->
                     service.findAllUsers()
             );
 
@@ -199,17 +199,17 @@ class UsuarioServiceTest {
         void lanca_uma_excecao_se_o_usuario_nao_for_encontrado() {
             when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.empty());
 
-            Exception ex1 = assertThrows(UserNotFound.class, () ->
+            Exception ex1 = assertThrows(NotFoundException.class, () ->
                 service.findUserById(usuarioRequestMock.getId())
             );
             assertEquals("Usuário não encontrado", ex1.getMessage());
 
-            Exception ex2 = assertThrows(UserNotFound.class, () ->
+            Exception ex2 = assertThrows(NotFoundException.class, () ->
                     service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock)
             );
             assertEquals("Usuário não encontrado", ex2.getMessage());
 
-            Exception ex3 = assertThrows(UserNotFound.class, () ->
+            Exception ex3 = assertThrows(NotFoundException.class, () ->
                     service.deleteUserById(usuarioRequestMock.getId())
             );
             assertEquals("Usuário não encontrado", ex3.getMessage());

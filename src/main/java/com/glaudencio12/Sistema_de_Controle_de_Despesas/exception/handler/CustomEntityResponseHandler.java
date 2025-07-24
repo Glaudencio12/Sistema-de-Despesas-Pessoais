@@ -1,7 +1,8 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.handler;
 
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.CategoryCannotBeDuplicateException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.UserNotFound;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponse;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponseValidate;
 import org.springframework.http.HttpStatus;
@@ -37,13 +38,13 @@ public class CustomEntityResponseHandler{
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(EmailCannotBeDuplicatedException.class)
-    public final ResponseEntity<ExceptionResponse> handlerEmailDuplicatedException(Exception ex, WebRequest request){
+    @ExceptionHandler({EmailCannotBeDuplicatedException.class, CategoryCannotBeDuplicateException.class})
+    public final ResponseEntity<ExceptionResponse> handlerEmailOrCategoryDuplicatedException(Exception ex, WebRequest request){
         ExceptionResponse response = new ExceptionResponse(dataFormatada, ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(UserNotFound.class)
+    @ExceptionHandler(NotFoundException.class)
     public final ResponseEntity<ExceptionResponse> handlerUserNotFound(Exception ex, WebRequest request){
         ExceptionResponse response = new ExceptionResponse(dataFormatada, ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
