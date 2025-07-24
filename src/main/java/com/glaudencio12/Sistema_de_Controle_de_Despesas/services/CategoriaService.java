@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CategoriaService {
     Logger logger = LoggerFactory.getLogger(CategoriaService.class.getName());
@@ -25,7 +27,7 @@ public class CategoriaService {
 
     public CategoriaResponseDTO createCategory(CategoriaRequestDTO categoriaRequest) {
         logger.info("Iniciando cadastro de categoria com o nome de {}", categoriaRequest.getNome());
-        Categoria categoriaCadastrada = repository.findByName(categoriaRequest.getNome());
+        Categoria categoriaCadastrada = repository.findByNome(categoriaRequest.getNome());
         if (categoriaCadastrada != null) {
             throw new RuntimeException("A categoria fornecida já está cadastrada na base de dados");
         } else {
@@ -44,5 +46,24 @@ public class CategoriaService {
         return dto;
     }
 
+    public List<CategoriaResponseDTO> findAllCatgorys() {
+        logger.info("Buscando todas as categorias no banco");
+        List<Categoria> categorias = repository.findAll();
+        if (categorias.isEmpty()) {
+            throw new NotFoundException("Nenhuma categoria encontrada");
+        } else {
+            List<CategoriaResponseDTO> dtos = ObjectMapper.parseObjects(categorias, CategoriaResponseDTO.class);
+            dtos.forEach(hateoasLinks::links);
+            return dtos;
+        }
+    }
 
+    public void deleteCategoryByName(String nomeCategoria) {
+        Categoria categoria = repository.findByNome(nomeCategoria);
+        if (categoria == null) {
+            throw new NotFoundException("A categoria fornecida não foi cadastrada");
+        } else {
+            repository.delete(categoria);
+        }
+    }
 }

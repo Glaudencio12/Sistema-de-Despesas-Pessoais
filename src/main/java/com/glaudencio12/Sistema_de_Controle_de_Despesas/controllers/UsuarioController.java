@@ -13,10 +13,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/controle-de-despesas")
 public class UsuarioController {
-    @Autowired
-    private UsuarioService service;
+    private final UsuarioService service;
 
-    @PostMapping
+    public UsuarioController(UsuarioService service) {
+        this.service = service;
+    }
+
+    @PostMapping("/register-user")
     public UsuarioResponseDTO create(@RequestBody @Valid UsuarioRequestDTO usuario){
         return service.createUser(usuario);
     }
@@ -26,7 +29,7 @@ public class UsuarioController {
         return service.findUserById(id);
     }
 
-    @GetMapping("/find-users")
+    @GetMapping("/findAll-users")
     public List<UsuarioResponseDTO> findAll(){
         return service.findAllUsers();
     }

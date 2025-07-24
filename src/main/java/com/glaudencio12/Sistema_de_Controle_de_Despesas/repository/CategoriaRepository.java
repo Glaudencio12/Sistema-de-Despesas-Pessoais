@@ -4,5 +4,5 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
-    Categoria findByName(String nomeCategoria);
+    Categoria findByNome(String nomeCategoria);
 }
