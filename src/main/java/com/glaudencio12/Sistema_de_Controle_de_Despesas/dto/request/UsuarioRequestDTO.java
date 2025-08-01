@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Data
 public class UsuarioRequestDTO {
     private Long id;
+
     @NotBlank(message = "O nome do usuário é obrigatório")
     @Size(min = 3, max = 100, message = "O nome do usuário precisa ter entre 3 a 100 caracteres")
     private String nome;

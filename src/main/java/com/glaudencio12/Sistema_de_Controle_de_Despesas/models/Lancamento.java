@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lancamento")
@@ -19,7 +19,7 @@ public class Lancamento {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal valor;
     @Column(nullable = false)
-    private LocalDate data;
+    private String data;
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private TipoLancamentoCategoria tipo;

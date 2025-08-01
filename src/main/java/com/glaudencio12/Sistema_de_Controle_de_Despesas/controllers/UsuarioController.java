@@ -4,14 +4,13 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioReque
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/controle-de-despesas")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
     private final UsuarioService service;
 
@@ -19,27 +18,27 @@ public class UsuarioController {
         this.service = service;
     }
 
-    @PostMapping("/register-user")
+    @PostMapping
     public UsuarioResponseDTO create(@RequestBody @Valid UsuarioRequestDTO usuario){
         return service.createUser(usuario);
     }
 
-    @GetMapping("/find-user/{id}")
+    @GetMapping("/{id}")
     public UsuarioResponseDTO findById(@PathVariable("id") Long id){
         return service.findUserById(id);
     }
 
-    @GetMapping("/findAll-users")
+    @GetMapping
     public List<UsuarioResponseDTO> findAll(){
         return service.findAllUsers();
     }
 
-    @PutMapping("/update-user/{id}")
+    @PutMapping("/{id}")
     public UsuarioResponseDTO update(@PathVariable("id") Long id, @RequestBody @Valid UsuarioRequestDTO usuarioRequest){
         return service.updateUserById(id, usuarioRequest);
     }
 
-    @DeleteMapping("/delete-user/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         service.deleteUserById(id);
         return ResponseEntity.noContent().build();

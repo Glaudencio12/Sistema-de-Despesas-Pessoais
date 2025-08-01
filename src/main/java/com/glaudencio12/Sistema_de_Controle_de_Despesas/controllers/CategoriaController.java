@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/controle-de-despesas")
+@RequestMapping("/api/categorias")
 public class CategoriaController {
     private final CategoriaService service;
 
@@ -18,22 +18,22 @@ public class CategoriaController {
         this.service = service;
     }
 
-    @PostMapping("/create-category")
+    @PostMapping
     public CategoriaResponseDTO create(@RequestBody @Valid CategoriaRequestDTO categoriaRequest){
         return service.createCategory(categoriaRequest);
     }
 
-    @GetMapping("/find-category/{id}")
+    @GetMapping("/{id}")
     public CategoriaResponseDTO findById(@PathVariable("id") Long id){
         return service.findCatgeoryById(id);
     }
 
-    @GetMapping("/findAll-categorys")
+    @GetMapping
     public List<CategoriaResponseDTO> findAll(){
         return service.findAllCatgorys();
     }
 
-    @DeleteMapping("/delete-category/{nomeCategoria}")
+    @DeleteMapping("/{nomeCategoria}")
     public ResponseEntity<?> delete(@PathVariable("nomeCategoria") String nomeCategoria){
         service.deleteCategoryByName(nomeCategoria);
         return ResponseEntity.noContent().build();

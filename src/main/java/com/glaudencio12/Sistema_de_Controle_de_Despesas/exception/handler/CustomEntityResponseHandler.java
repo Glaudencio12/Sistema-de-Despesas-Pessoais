@@ -5,6 +5,7 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeD
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponse;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponseValidate;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.DataFormatada;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -21,10 +22,6 @@ import java.util.List;
 @ControllerAdvice
 public class CustomEntityResponseHandler{
 
-    LocalDateTime localDateTime = LocalDateTime.now();
-    DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-    String dataFormatada = localDateTime.format(formatoData);
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public final ResponseEntity<ExceptionResponseValidate> handleValidationException(MethodArgumentNotValidException ex) {
        List<String> erros = new ArrayList<>();
@@ -34,19 +31,19 @@ public class CustomEntityResponseHandler{
            erros.add(mensagem);
        }
 
-        ExceptionResponseValidate response = new ExceptionResponseValidate(dataFormatada, "Erro de validação", erros);
+        ExceptionResponseValidate response = new ExceptionResponseValidate(DataFormatada.data(), "Erro de validação", erros);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({EmailCannotBeDuplicatedException.class, CategoryCannotBeDuplicateException.class})
     public final ResponseEntity<ExceptionResponse> handlerEmailOrCategoryDuplicatedException(Exception ex, WebRequest request){
-        ExceptionResponse response = new ExceptionResponse(dataFormatada, ex.getMessage(), request.getDescription(false));
+        ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public final ResponseEntity<ExceptionResponse> handlerUserNotFound(Exception ex, WebRequest request){
-        ExceptionResponse response = new ExceptionResponse(dataFormatada, ex.getMessage(), request.getDescription(false));
+        ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
