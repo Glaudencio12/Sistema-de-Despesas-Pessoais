@@ -1,7 +1,6 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Lancamento;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancamentoCategoria;
 import lombok.Data;
 
@@ -14,6 +13,9 @@ public class LancamentoResponseDTO {
     private BigDecimal valor;
     private String data;
     private TipoLancamentoCategoria tipo;
-    private CategoriaResponseDTO categoria;
-    private UsuarioResponseDTO usuario;
+    private String categoria;
+    @JsonProperty("lancado_por")
+    private String nomeUsuario;
+    @JsonProperty("email_de_quem_lancou")
+    private String emailUsuario;
 }

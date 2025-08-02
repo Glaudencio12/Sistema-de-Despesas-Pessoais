@@ -3,6 +3,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.LancamentoRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundException;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.LancamentoMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Lancamento;
@@ -15,6 +16,9 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class LancamentoService {
@@ -42,11 +46,27 @@ public class LancamentoService {
         entidade.setData(DataFormatada.data());
         entidade.setUsuario(usuario);
         entidade.setCategoria(categoria);
-        return ObjectMapper.parseObject(lancamentoRepository.save(entidade), LancamentoResponseDTO.class);
+
+        Lancamento salvo = lancamentoRepository.save(entidade);
+        return LancamentoMapper.toResponseDTO(salvo);
     }
 
     public LancamentoResponseDTO findLaunchById(Long id) {
         Lancamento lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new NotFoundException("Lançamento não encontrado"));
-        return ObjectMapper.parseObject(lancamento, LancamentoResponseDTO.class);
+        Lancamento salvo = lancamentoRepository.save(lancamento);
+        return LancamentoMapper.toResponseDTO(salvo);
+    }
+
+    public List<LancamentoResponseDTO> findAllLaunches() {
+        List<Lancamento> lancamentos = lancamentoRepository.findAll();
+        if (lancamentos.isEmpty()) {
+            throw new NotFoundException("Nenhum lançameto encontrado");
+        }
+
+        List<LancamentoResponseDTO> lancamentosDTO = new ArrayList<>();
+        for (Lancamento lancamento : lancamentos) {
+            lancamentosDTO.add(LancamentoMapper.toResponseDTO(lancamento));
+        }
+        return lancamentosDTO;
     }
 }
