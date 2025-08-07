@@ -1,6 +1,7 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -23,5 +24,6 @@ public class UsuarioRequestDTO {
     private String senha;
 
     @JsonProperty("data_cadastro")
+    @Schema(hidden = true)
     private LocalDate dataCadastro;
 }
