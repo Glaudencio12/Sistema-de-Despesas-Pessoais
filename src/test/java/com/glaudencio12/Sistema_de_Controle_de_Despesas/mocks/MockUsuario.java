@@ -29,7 +29,6 @@ public class MockUsuario {
             responseDTO.setId(1L);
             responseDTO.setNome("Nome test");
             responseDTO.setEmail("emailTest2@gmail.com");
-            responseDTO.setSenha("senha123");
             responseDTO.setDataCadastro(LocalDate.now());
             return responseDTO;
         }

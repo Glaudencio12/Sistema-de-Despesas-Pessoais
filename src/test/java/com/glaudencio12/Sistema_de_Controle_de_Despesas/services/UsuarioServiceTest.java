@@ -71,11 +71,11 @@ class UsuarioServiceTest {
         verify(repository, atLeastOnce()).save(any(Usuario.class));
         verify(hateoasLinks, times(1)).links(any(UsuarioResponseDTO.class));
 
-        links(resposta, "FindUserById", "api/controle-de-despesas/find-user/1", "GET");
-        links(resposta, "FindAllUsers", "api/controle-de-despesas/find-users", "GET");
-        links(resposta, "CreateUser", "api/controle-de-despesas", "POST");
-        links(resposta, "UpdateUserById", "api/controle-de-despesas/update-user/1", "PUT");
-        links(resposta, "DeleteUser", "api/controle-de-despesas/delete-user/1", "DELETE");
+        links(resposta, "FindUserById", "/api/usuarios/1", "GET");
+        links(resposta, "FindAllUsers", "/api/usuarios", "GET");
+        links(resposta, "CreateUser", "/api/usuarios", "POST");
+        links(resposta, "UpdateUserById", "/api/usuarios/1", "PUT");
+        links(resposta, "DeleteUser", "/api/usuarios/1", "DELETE");
     }
 
     @Test
@@ -92,11 +92,11 @@ class UsuarioServiceTest {
         verify(repository, atLeastOnce()).findById(usuarioRequestMock.getId());
         verify(hateoasLinks, times(1)).links(any(UsuarioResponseDTO.class));
 
-        links(resposta, "FindUserById", "api/controle-de-despesas/find-user/1", "GET");
-        links(resposta, "FindAllUsers", "api/controle-de-despesas/find-users", "GET");
-        links(resposta, "CreateUser", "api/controle-de-despesas", "POST");
-        links(resposta, "UpdateUserById", "api/controle-de-despesas/update-user/1", "PUT");
-        links(resposta, "DeleteUser", "api/controle-de-despesas/delete-user/1", "DELETE");
+        links(resposta, "FindUserById", "/api/usuarios/1", "GET");
+        links(resposta, "FindAllUsers", "/api/usuarios", "GET");
+        links(resposta, "CreateUser", "/api/usuarios", "POST");
+        links(resposta, "UpdateUserById", "/api/usuarios/1", "PUT");
+        links(resposta, "DeleteUser", "/api/usuarios/1", "DELETE");
     }
 
     @Test
@@ -113,18 +113,18 @@ class UsuarioServiceTest {
         verify(hateoasLinks, times(3)).links(any(UsuarioResponseDTO.class));
 
         UsuarioResponseDTO usuario1 = resposta.getFirst();
-        links(usuario1, "FindUserById", "api/controle-de-despesas/find-user/1", "GET");
-        links(usuario1, "FindAllUsers", "api/controle-de-despesas/find-users", "GET");
-        links(usuario1, "CreateUser", "api/controle-de-despesas", "POST");
-        links(usuario1, "UpdateUserById", "api/controle-de-despesas/update-user/1", "PUT");
-        links(usuario1, "DeleteUser", "api/controle-de-despesas/delete-user/1", "DELETE");
+        links(usuario1, "FindUserById", "/api/usuarios/1", "GET");
+        links(usuario1, "FindAllUsers", "/api/usuarios", "GET");
+        links(usuario1, "CreateUser", "/api/usuarios", "POST");
+        links(usuario1, "UpdateUserById", "/api/usuarios/1", "PUT");
+        links(usuario1, "DeleteUser", "/api/usuarios/1", "DELETE");
 
         UsuarioResponseDTO usuario2 = resposta.getLast();
-        links(usuario2, "FindUserById", "api/controle-de-despesas/find-user/3", "GET");
-        links(usuario2, "FindAllUsers", "api/controle-de-despesas/find-users", "GET");
-        links(usuario2, "CreateUser", "api/controle-de-despesas", "POST");
-        links(usuario2, "UpdateUserById", "api/controle-de-despesas/update-user/3", "PUT");
-        links(usuario2, "DeleteUser", "api/controle-de-despesas/delete-user/3", "DELETE");
+        links(usuario2, "FindUserById", "/api/usuarios/3", "GET");
+        links(usuario2, "FindAllUsers", "/api/usuarios", "GET");
+        links(usuario2, "CreateUser", "/api/usuarios", "POST");
+        links(usuario2, "UpdateUserById", "/api/usuarios/3", "PUT");
+        links(usuario2, "DeleteUser", "/api/usuarios/3", "DELETE");
     }
 
     @Test
@@ -144,11 +144,11 @@ class UsuarioServiceTest {
         verify(repository, atLeastOnce()).save(any(Usuario.class));
         verify(hateoasLinks, times(1)).links(any(UsuarioResponseDTO.class));
 
-        links(resposta, "FindUserById", "api/controle-de-despesas/find-user/1", "GET");
-        links(resposta, "FindAllUsers", "api/controle-de-despesas/find-users", "GET");
-        links(resposta, "CreateUser", "api/controle-de-despesas", "POST");
-        links(resposta, "UpdateUserById", "api/controle-de-despesas/update-user/1", "PUT");
-        links(resposta, "DeleteUser", "api/controle-de-despesas/delete-user/1", "DELETE");
+        links(resposta, "FindUserById", "/api/usuarios/1", "GET");
+        links(resposta, "FindAllUsers", "/api/usuarios", "GET");
+        links(resposta, "CreateUser", "/api/usuarios", "POST");
+        links(resposta, "UpdateUserById", "/api/usuarios/1", "PUT");
+        links(resposta, "DeleteUser", "/api/usuarios/1", "DELETE");
     }
 
     @Test

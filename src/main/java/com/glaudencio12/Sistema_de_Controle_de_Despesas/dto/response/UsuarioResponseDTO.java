@@ -1,12 +1,14 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 public class UsuarioResponseDTO extends RepresentationModel<UsuarioResponseDTO> {
     private Long id;
     private String nome;
