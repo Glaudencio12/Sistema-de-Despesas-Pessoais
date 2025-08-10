@@ -9,8 +9,8 @@ public class DotEnvInitializer implements ApplicationContextInitializer<Configur
     public void initialize(ConfigurableApplicationContext applicationContext) {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().directory(System.getenv("DOTENV_PATH") != null ?
                 System.getenv("DOTENV_PATH") : ".").load();
-        System.setProperty("DB_URL", dotenv.get("DB_URL"));
-        System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
-        System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+        System.setProperty("DB_URL_LOCAL", dotenv.get("DB_URL_LOCAL"));
+        System.setProperty("DB_USER_LOCAL", dotenv.get("DB_USER_LOCAL"));
+        System.setProperty("DB_PASSWORD_LOCAL", dotenv.get("DB_PASSWORD_LOCAL"));
     }
 }

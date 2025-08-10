@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:9.0.1
+    container_name: bd_mysql_controle_despesas
+    restart: always
+    environment:
+      MYSQL_DATABASE: despesas_pessoais
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - network_api
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  app:
+    image: glaudencio123/depesas-pessoais:v1.0.
+    container_name: api_controle_de_despesas
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL_DOCKER}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER_DOCKER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD_DOCKER}
+    networks:
+      - network_api
+
+volumes:
+  db_data:
+
+networks:
+  network_api:

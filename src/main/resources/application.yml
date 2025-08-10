@@ -3,9 +3,9 @@ spring:
     name: Sistema_de_Controle_de_Despesas
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL_LOCAL}
+    username: ${DB_USER_LOCAL}
+    password: ${DB_PASSWORD_LOCAL}
   jpa:
     hibernate:
       ddl-auto: update
