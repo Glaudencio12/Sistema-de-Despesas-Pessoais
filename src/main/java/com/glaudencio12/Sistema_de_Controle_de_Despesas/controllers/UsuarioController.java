@@ -15,6 +15,7 @@ import java.util.List;
 @RequestMapping("/api/usuarios")
 @Tag(name = "Usuários", description = "Esta seção reúne os endpoints responsáveis pelas operações de criação, consulta, atualização e exclusão de usuários.")
 public class UsuarioController implements UsuarioControllerDocs {
+
     private final UsuarioService service;
 
     public UsuarioController(UsuarioService service) {

@@ -48,13 +48,17 @@ public class LancamentoService {
         entidade.setCategoria(categoria);
 
         Lancamento salvo = lancamentoRepository.save(entidade);
-        return LancamentoMapper.toResponseDTO(salvo);
+        LancamentoResponseDTO dto = LancamentoMapper.toResponseDTO(salvo);
+        hateoasLinks.links(dto);
+        return dto;
     }
 
     public LancamentoResponseDTO findLaunchById(Long id) {
         Lancamento lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new NotFoundException("Lançamento não encontrado"));
         Lancamento salvo = lancamentoRepository.save(lancamento);
-        return LancamentoMapper.toResponseDTO(salvo);
+        LancamentoResponseDTO dto = LancamentoMapper.toResponseDTO(salvo);
+        hateoasLinks.links(dto);
+        return dto;
     }
 
     public List<LancamentoResponseDTO> findAllLaunches() {
@@ -64,9 +68,8 @@ public class LancamentoService {
         }
 
         List<LancamentoResponseDTO> lancamentosDTO = new ArrayList<>();
-        for (Lancamento lancamento : lancamentos) {
-            lancamentosDTO.add(LancamentoMapper.toResponseDTO(lancamento));
-        }
+        lancamentos.forEach(lancamento -> lancamentosDTO.add(LancamentoMapper.toResponseDTO(lancamento)));
+        lancamentosDTO.forEach(hateoasLinks::links);
         return lancamentosDTO;
     }
 }

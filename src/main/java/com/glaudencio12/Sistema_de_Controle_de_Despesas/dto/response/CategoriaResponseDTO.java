@@ -1,10 +1,13 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancamentoCategoria;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
-@Data
-public class CategoriaResponseDTO {
+@Getter
+@Setter
+public class CategoriaResponseDTO extends RepresentationModel<CategoriaResponseDTO> {
     private Long id;
     private String nome;
     private TipoLancamentoCategoria tipo;
