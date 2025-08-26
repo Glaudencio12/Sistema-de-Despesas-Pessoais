@@ -1,10 +1,10 @@
 # Sistema de Controle de Despesas
 
-## 📋 Descrição
+## Descrição
 
 Sistema de Controle de Despesas é uma aplicação Spring Boot desenvolvida para gerenciar despesas e receitas pessoais. O sistema permite aos usuários cadastrar categorias de gastos, registrar lançamentos financeiros e acompanhar seu fluxo de caixa de forma organizada.
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Java 21**
 - **Spring Boot 3.5.3**
@@ -14,7 +14,7 @@ Sistema de Controle de Despesas é uma aplicação Spring Boot desenvolvida para
 - **Docker**
 - **Maven**
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 Sistema_de_Controle_de_Despesas/
@@ -44,7 +44,7 @@ Sistema_de_Controle_de_Despesas/
 └── README.md                             # Este arquivo
 ```
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 O projeto segue uma arquitetura em camadas com as seguintes responsabilidades:
 
@@ -56,7 +56,7 @@ O projeto segue uma arquitetura em camadas com as seguintes responsabilidades:
 - **Mappers**: Conversão entre objetos
 - **Exception Handler**: Tratamento de erros
 
-## 📊 Modelo de Dados
+## Modelo de Dados
 
 ### Entidades Principais
 
@@ -85,7 +85,7 @@ O projeto segue uma arquitetura em camadas com as seguintes responsabilidades:
 - `categoria`: Categoria do lançamento
 - `usuario`: Usuário proprietário
 
-## 🔧 Configuração e Instalação
+## Configuração e Instalação
 
 ### Pré-requisitos
 
@@ -133,7 +133,7 @@ DB_PASSWORD_LOCAL=sua_senha
    docker-compose up -d
    ```
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Usuários
 
@@ -159,14 +159,14 @@ DB_PASSWORD_LOCAL=sua_senha
 - `PUT /api/lancamentos/{id}` - Atualizar lançamento
 - `DELETE /api/lancamentos/{id}` - Deletar lançamento
 
-## 📖 Documentação da API
+## Documentação da API
 
 A documentação interativa da API está disponível através do Swagger UI:
 
 - **URL**: `http://localhost:8080/swagger-ui.html`
 - **OpenAPI JSON**: `http://localhost:8080/v3/api-docs`
 
-## 🧪 Testes (Em desenvolvimento)
+## Testes (Em desenvolvimento)
 
 ### Executando Testes
 
@@ -191,14 +191,14 @@ docker build -t sistema-despesas .
 docker run -p 8080:8080 sistema-despesas
 ```
 
-## 🔒 Segurança
+## Segurança
 
 - Validação de dados de entrada
 - Tratamento de exceções personalizado
 - Validação de unicidade de email
 - Validação de categorias duplicadas
 
-## 📝 Funcionalidades
+## Funcionalidades
 
 ### Usuários
 - ✅ Cadastro de usuários
@@ -224,7 +224,7 @@ docker run -p 8080:8080 sistema-despesas
 - ✅ Mapeamento de objetos
 - ✅ Validações de entrada
 
-## 🐛 Tratamento de Erros
+## Tratamento de Erros
 
 O sistema possui tratamento personalizado para os seguintes erros:
 
@@ -233,7 +233,7 @@ O sistema possui tratamento personalizado para os seguintes erros:
 - `CategoryCannotBeDuplicateException` - Categoria duplicada
 - Validações de entrada com `@Valid`
 
-## 🤝 Contribuição
+## Contribuição
 
 1. Faça um fork do projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)

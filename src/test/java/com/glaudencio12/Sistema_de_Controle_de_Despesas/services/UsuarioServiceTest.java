@@ -172,12 +172,18 @@ class UsuarioServiceTest {
         void lanca_excecao_se_o_email_estiver_duplicado() {
             when(repository.findByEmail(usuarioRequestMock.getEmail())).thenReturn(usuarioEntidade);
 
-            Exception ex = assertThrows(EmailCannotBeDuplicatedException.class, () -> {
+            Exception ex1 = assertThrows(EmailCannotBeDuplicatedException.class, () -> {
                 service.createUser(usuarioRequestMock);
+            });
+
+            assertEquals("O email fornecido já está cadastrado na base de dados", ex1.getMessage());
+            verify(repository, atLeastOnce()).findByEmail(usuarioRequestMock.getEmail());
+
+            Exception ex2 = assertThrows(EmailCannotBeDuplicatedException.class, () ->{
                 service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock);
             });
 
-            assertEquals("O email fornecido já está cadastrado na base de dados", ex.getMessage());
+            assertEquals("O email fornecido já está cadastrado na base de dados", ex2.getMessage());
             verify(repository, atLeastOnce()).findByEmail(usuarioRequestMock.getEmail());
         }
 
@@ -202,16 +208,19 @@ class UsuarioServiceTest {
             Exception ex1 = assertThrows(NotFoundException.class, () ->
                 service.findUserById(usuarioRequestMock.getId())
             );
+
             assertEquals("Usuário não encontrado", ex1.getMessage());
 
             Exception ex2 = assertThrows(NotFoundException.class, () ->
                     service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock)
             );
+
             assertEquals("Usuário não encontrado", ex2.getMessage());
 
             Exception ex3 = assertThrows(NotFoundException.class, () ->
                     service.deleteUserById(usuarioRequestMock.getId())
             );
+
             assertEquals("Usuário não encontrado", ex3.getMessage());
 
             verify(repository, times(3)).findById(usuarioRequestMock.getId());

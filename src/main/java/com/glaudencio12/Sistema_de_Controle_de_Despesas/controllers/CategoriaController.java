@@ -6,6 +6,7 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaRe
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.CategoriaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,25 +24,28 @@ public class CategoriaController implements CategoriaControllerDocs {
 
     @PostMapping
     @Override
-    public CategoriaResponseDTO create(@RequestBody @Valid CategoriaRequestDTO categoriaRequest){
-        return service.createCategory(categoriaRequest);
+    public ResponseEntity<CategoriaResponseDTO> create(@RequestBody @Valid CategoriaRequestDTO categoriaRequest){
+        CategoriaResponseDTO categoriaResponse = service.createCategory(categoriaRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaResponse);
     }
 
     @GetMapping("/{id}")
     @Override
-    public CategoriaResponseDTO findById(@PathVariable("id") Long id){
-        return service.findCatgeoryById(id);
+    public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable("id") Long id){
+        CategoriaResponseDTO categoriaResponse = service.findCatgeoryById(id);
+        return ResponseEntity.ok(categoriaResponse);
     }
 
     @GetMapping
     @Override
-    public List<CategoriaResponseDTO> findAll(){
-        return service.findAllCatgorys();
+    public ResponseEntity<List<CategoriaResponseDTO>> findAll(){
+        List<CategoriaResponseDTO> categoriasResponse = service.findAllCatgorys();
+        return ResponseEntity.ok(categoriasResponse);
     }
 
     @DeleteMapping("/{nomeCategoria}")
     @Override
-    public ResponseEntity<?> delete(@PathVariable("nomeCategoria") String nomeCategoria){
+    public ResponseEntity<Void> delete(@PathVariable("nomeCategoria") String nomeCategoria){
         service.deleteCategoryByName(nomeCategoria);
         return ResponseEntity.noContent().build();
     }

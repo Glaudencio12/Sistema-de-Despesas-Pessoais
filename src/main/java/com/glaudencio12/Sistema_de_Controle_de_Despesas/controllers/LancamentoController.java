@@ -6,6 +6,9 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoR
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.LancamentoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -21,19 +24,22 @@ public class LancamentoController implements LancamentoControllerDocs {
 
     @PostMapping
     @Override
-    public LancamentoResponseDTO create(@RequestBody @Valid LancamentoRequestDTO lancamento){
-        return service.createLaunch(lancamento);
+    public ResponseEntity<LancamentoResponseDTO> create(@RequestBody @Valid LancamentoRequestDTO lancamento){
+        LancamentoResponseDTO lancamentoResponse = service.createLaunch(lancamento);
+        return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoResponse);
     }
 
     @GetMapping("/{id}")
     @Override
-    public LancamentoResponseDTO findById(@PathVariable("id") Long id){
-        return service.findLaunchById(id);
+    public ResponseEntity<LancamentoResponseDTO> findById(@PathVariable("id") Long id){
+        LancamentoResponseDTO lancamentoResponse = service.findLaunchById(id);
+        return ResponseEntity.ok(lancamentoResponse);
     }
 
     @GetMapping
     @Override
-    public List<LancamentoResponseDTO> findAll(){
-        return service.findAllLaunches();
+    public ResponseEntity<List<LancamentoResponseDTO>> findAll(){
+        List<LancamentoResponseDTO> lancamentosResponse = service.findAllLaunches();
+        return ResponseEntity.ok(lancamentosResponse);
     }
 }

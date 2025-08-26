@@ -25,7 +25,7 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "409", description = "Email duplicado", content = @Content)
             }
     )
-    UsuarioResponseDTO create(@RequestBody UsuarioRequestDTO usuario);
+    ResponseEntity<UsuarioResponseDTO> create(@RequestBody UsuarioRequestDTO usuario);
 
     @Operation(summary = "Busca usuário por ID", description = "Retorna os dados de um usuário específico", tags = { "Usuário" },
             responses = {
@@ -38,7 +38,7 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content)
             }
     )
-    UsuarioResponseDTO findById(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id);
+    ResponseEntity<UsuarioResponseDTO> findById(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id);
 
     @Operation(summary = "Lista todos os usuários", description = "Retorna uma lista com todos os usuários cadastrados", tags = { "Usuário" },
             responses = {
@@ -51,7 +51,7 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content)
             }
     )
-    List<UsuarioResponseDTO> findAll();
+    ResponseEntity<List<UsuarioResponseDTO>> findAll();
 
     @Operation(summary = "Atualiza usuário", description = "Atualiza os dados de um usuário existente pelo ID", tags = { "Usuário" },
             responses = {
@@ -65,7 +65,7 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "409", description = "Email duplicado", content = @Content)
             }
     )
-    UsuarioResponseDTO update(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id, @RequestBody UsuarioRequestDTO usuarioRequest);
+    ResponseEntity<UsuarioResponseDTO> update(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id, @RequestBody UsuarioRequestDTO usuarioRequest);
 
     @Operation(summary = "Remove usuário", description = "Remove um usuário existente pelo ID", tags = { "Usuário" },
             responses = {

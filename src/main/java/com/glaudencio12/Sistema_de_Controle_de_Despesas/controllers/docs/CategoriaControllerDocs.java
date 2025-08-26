@@ -15,51 +15,53 @@ import java.util.List;
 
 public interface CategoriaControllerDocs {
 
-    @Operation(summary = "Registra uma categoria", description = "Registra uma categoria do usuário", tags = { "Categorias" },
+    @Operation(summary = "Cria uma categoria", description = "Cria uma nova categoria associada ao usuário.", tags = { "Categorias" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Categoria registrada com sucesso",
-                            content = @Content(schema = @Schema(implementation = CategoriaResponseDTO.class))
-                    ),
+                    @ApiResponse(responseCode = "201", description = "Categoria registrada com sucesso",
+                            content = @Content(schema = @Schema(implementation = CategoriaResponseDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content),
-                    @ApiResponse(responseCode = "409", description = "Categoria duplicada", content = @Content)
+                    @ApiResponse(responseCode = "409", description = "Categoria duplicada", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    CategoriaResponseDTO create(@RequestBody CategoriaRequestDTO categoriaRequest);
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    ResponseEntity<CategoriaResponseDTO> create(@RequestBody CategoriaRequestDTO categoriaRequest);
 
-    @Operation(summary = "Busca uma categoria", description = "Busca uma categoria registrada pelo usuário", tags = { "Categorias" },
+    @Operation(summary = "Busca uma categoria", description = "Recupera os detalhes de uma categoria a partir do seu ID.", tags = { "Categorias" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Categoria encontrada com sucesso",
                             content = @Content(schema = @Schema(implementation = CategoriaResponseDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    CategoriaResponseDTO findById(@Parameter(description = "ID da categoria", example = "1") @PathVariable("id") Long id);
+    @GetMapping(value = "/{id}", produces = "application/json")
+    ResponseEntity<CategoriaResponseDTO> findById(@Parameter(description = "ID da categoria", example = "1") @PathVariable("id") Long id);
 
-    @Operation(summary = "Busca todas as categorias", description = "Busca todas as categorias registradas pelo usuário", tags = { "Categorias" },
+    @Operation(summary = "Lista todas as categorias", description = "Lista todas as categorias cadastradas pelo usuário.", tags = { "Categorias" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Categorias encontradas com sucesso",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = CategoriaResponseDTO.class)))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Categorias não encontradas", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Nenhuma categoria encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    List<CategoriaResponseDTO> findAll();
+    @GetMapping(produces = "application/json")
+    ResponseEntity<List<CategoriaResponseDTO>> findAll();
 
-    @Operation(summary = "Exclui uma categoria", description = "Exclui uma categoria registrada pelo usuário", tags = { "Categorias" },
+    @Operation(summary = "Exclui uma categoria", description = "Remove uma categoria a partir do seu ID.", tags = { "Categorias" },
             responses = {
                     @ApiResponse(responseCode = "204", description = "Categoria excluída com sucesso", content = @Content),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content),
             }
     )
-    ResponseEntity<?> delete(@Parameter(description = "Nome da categoria", example = "transporte") @PathVariable("nomeCategoria") String nomeCategoria);
+    ResponseEntity<Void> delete(String nomeCategoria);
 }
