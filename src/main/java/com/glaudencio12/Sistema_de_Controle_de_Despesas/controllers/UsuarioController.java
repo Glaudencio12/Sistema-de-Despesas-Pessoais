@@ -7,6 +7,7 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.UsuarioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,37 +24,44 @@ public class UsuarioController implements UsuarioControllerDocs {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping(
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
+    )
     @Override
-    public ResponseEntity<UsuarioResponseDTO> create(@RequestBody @Valid UsuarioRequestDTO usuario){
+    public ResponseEntity<UsuarioResponseDTO> create(@RequestBody @Valid UsuarioRequestDTO usuario) {
         UsuarioResponseDTO usuarioResponse = service.createUser(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponse);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable("id") Long id){
+    public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable("id") Long id) {
         UsuarioResponseDTO usuario = service.findUserById(id);
         return ResponseEntity.ok(usuario);
     }
 
-    @GetMapping
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    public ResponseEntity<List<UsuarioResponseDTO>> findAll(){
+    public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
         List<UsuarioResponseDTO> usuarios = service.findAllUsers();
         return ResponseEntity.ok(usuarios);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(
+            value = "/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
+    )
     @Override
-    public ResponseEntity<UsuarioResponseDTO> update(@PathVariable("id") Long id, @RequestBody @Valid UsuarioRequestDTO usuarioRequest){
+    public ResponseEntity<UsuarioResponseDTO> update(@PathVariable("id") Long id, @RequestBody @Valid UsuarioRequestDTO usuarioRequest) {
         UsuarioResponseDTO usuarioResponse = service.updateUserById(id, usuarioRequest);
         return ResponseEntity.ok(usuarioResponse);
     }
 
     @DeleteMapping("/{id}")
     @Override
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id){
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         service.deleteUserById(id);
         return ResponseEntity.noContent().build();
     }

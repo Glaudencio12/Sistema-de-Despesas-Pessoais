@@ -5,9 +5,14 @@ import java.time.format.DateTimeFormatter;
 
 public class DataFormatada {
 
-    public static String data(){
-        LocalDateTime localDateTime = LocalDateTime.now();
+    public static String data(LocalDateTime dateTime){
         DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd-MM-yyyy | HH:mm:ss");
-        return localDateTime.format(formatoData);
+        return dateTime.format(formatoData);
+    }
+
+    public static String data(){
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd-MM-yyyy | HH:mm:ss");
+        return dateTime.format(formatoData);
     }
 }

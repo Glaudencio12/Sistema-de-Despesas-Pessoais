@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,16 +40,19 @@ public class LancamentoService {
     public LancamentoResponseDTO createLaunch(LancamentoRequestDTO lancamento) {
         Usuario usuario = usuarioRepository.findById(lancamento.getUsuarioId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
         Categoria categoria = categoriaRepository.findByNome(lancamento.getCategoria());
+
         if (categoria == null || !lancamento.getTipo().equals(categoria.getTipo())) {
             throw new NotFoundException("Categoria não encontrada");
         }
+
         Lancamento entidade = ObjectMapper.parseObject(lancamento, Lancamento.class);
-        entidade.setData(DataFormatada.data());
+        entidade.setData(LocalDateTime.now());
         entidade.setUsuario(usuario);
         entidade.setCategoria(categoria);
 
         Lancamento salvo = lancamentoRepository.save(entidade);
         LancamentoResponseDTO dto = LancamentoMapper.toResponseDTO(salvo);
+        dto.setData(DataFormatada.data(salvo.getData()));
         hateoasLinks.links(dto);
         return dto;
     }

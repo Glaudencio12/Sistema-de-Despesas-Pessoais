@@ -7,6 +7,7 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.CategoriaServic
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,21 +23,24 @@ public class CategoriaController implements CategoriaControllerDocs {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping(
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
+    )
     @Override
     public ResponseEntity<CategoriaResponseDTO> create(@RequestBody @Valid CategoriaRequestDTO categoriaRequest){
         CategoriaResponseDTO categoriaResponse = service.createCategory(categoriaRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaResponse);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
     public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable("id") Long id){
         CategoriaResponseDTO categoriaResponse = service.findCatgeoryById(id);
         return ResponseEntity.ok(categoriaResponse);
     }
 
-    @GetMapping
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
     public ResponseEntity<List<CategoriaResponseDTO>> findAll(){
         List<CategoriaResponseDTO> categoriasResponse = service.findAllCatgorys();

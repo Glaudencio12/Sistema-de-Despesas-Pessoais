@@ -19,7 +19,7 @@ public class Lancamento {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal valor;
     @Column(nullable = false)
-    private String data;
+    private LocalDateTime data;
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private TipoLancamentoCategoria tipo;
