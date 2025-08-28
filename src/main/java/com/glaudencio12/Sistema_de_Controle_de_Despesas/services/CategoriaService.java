@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 public class CategoriaService {
-    Logger logger = LoggerFactory.getLogger(CategoriaService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CategoriaService.class.getName());
 
     private final CategoriaRepository repository;
     private final HateoasLinks hateoasLinks;
@@ -59,6 +59,7 @@ public class CategoriaService {
     }
 
     public void deleteCategoryByName(String nomeCategoria) {
+        logger.info("Excluindo a categoria de nome {}", nomeCategoria);
         Categoria categoria = repository.findByNome(nomeCategoria);
         if (categoria == null) {
             throw new NotFoundException("A categoria fornecida não foi cadastrada");

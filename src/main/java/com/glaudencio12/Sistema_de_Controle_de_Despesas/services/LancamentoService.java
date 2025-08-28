@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 public class LancamentoService {
-    Logger logger = LoggerFactory.getLogger(LancamentoService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(LancamentoService.class.getName());
 
     private final LancamentoRepository lancamentoRepository;
     private final HateoasLinks hateoasLinks;
@@ -38,6 +38,7 @@ public class LancamentoService {
     }
 
     public LancamentoResponseDTO createLaunch(LancamentoRequestDTO lancamento) {
+        logger.info("Registrando um lançamento do tipo {}", lancamento.getTipo());
         Usuario usuario = usuarioRepository.findById(lancamento.getUsuarioId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
         Categoria categoria = categoriaRepository.findByNome(lancamento.getCategoria());
 
@@ -58,6 +59,7 @@ public class LancamentoService {
     }
 
     public LancamentoResponseDTO findLaunchById(Long id) {
+        logger.info("Buscando um lançamento com id {}", id);
         Lancamento lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new NotFoundException("Lançamento não encontrado"));
         Lancamento salvo = lancamentoRepository.save(lancamento);
         LancamentoResponseDTO dto = LancamentoMapper.toResponseDTO(salvo);
@@ -66,6 +68,7 @@ public class LancamentoService {
     }
 
     public List<LancamentoResponseDTO> findAllLaunches() {
+        logger.info("Buscando todos os lançamentos registrados");
         List<Lancamento> lancamentos = lancamentoRepository.findAll();
         if (lancamentos.isEmpty()) {
             throw new NotFoundException("Nenhum lançameto encontrado");
