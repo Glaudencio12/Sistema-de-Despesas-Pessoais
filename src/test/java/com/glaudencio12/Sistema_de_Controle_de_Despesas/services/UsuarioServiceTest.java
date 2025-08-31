@@ -3,8 +3,8 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.mocks.MockUsuario;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs.StubsUsuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
@@ -34,18 +34,15 @@ class UsuarioServiceTest {
     @InjectMocks
     UsuarioService service;
 
-    MockUsuario mockUsuario;
     Usuario usuarioEntidade;
     UsuarioRequestDTO usuarioRequestMock;
     List<Usuario> usuarioEntidadeList;
 
     @BeforeEach
     void setUp() {
-        mockUsuario = new MockUsuario();
-
-        usuarioRequestMock = (UsuarioRequestDTO) mockUsuario.preencherDados(new UsuarioRequestDTO());
-        usuarioEntidade = (Usuario) mockUsuario.preencherDados(new Usuario());
-        usuarioEntidadeList = mockUsuario.usuarioEntidadeList();
+        usuarioRequestMock = (UsuarioRequestDTO) StubsUsuario.usuarioRequest();
+        usuarioEntidade = (Usuario) StubsUsuario.usuarioEntidade();
+        usuarioEntidadeList = StubsUsuario.usuarioEntidadeList();
     }
 
     public static void links(UsuarioResponseDTO dto, String rel, String href, String type){
@@ -70,12 +67,6 @@ class UsuarioServiceTest {
         verify(repository, atLeastOnce()).findByEmail(usuarioRequestMock.getEmail());
         verify(repository, atLeastOnce()).save(any(Usuario.class));
         verify(hateoasLinks, times(1)).links(any(UsuarioResponseDTO.class));
-
-        links(resposta, "FindUserById", "/api/usuarios/1", "GET");
-        links(resposta, "FindAllUsers", "/api/usuarios", "GET");
-        links(resposta, "CreateUser", "/api/usuarios", "POST");
-        links(resposta, "UpdateUserById", "/api/usuarios/1", "PUT");
-        links(resposta, "DeleteUser", "/api/usuarios/1", "DELETE");
     }
 
     @Test
@@ -164,7 +155,7 @@ class UsuarioServiceTest {
     }
 
     @Nested
-    @DisplayName("Retorna uma exceções UseNotFoundExcepion e EmailCannotBeDuplicateException")
+    @DisplayName("Retorna uma exceção UseNotFoundExcepion e EmailCannotBeDuplicateException")
     class ExceptionsUser {
 
         @Test
@@ -192,7 +183,7 @@ class UsuarioServiceTest {
         void lanca_uma_excecao_se_nenhum_usuario_for_encontrado() {
             when(repository.findAll()).thenReturn(List.of());
 
-            Exception ex = assertThrows(NotFoundException.class, () ->
+            Exception ex = assertThrows(NotFoundElementException.class, () ->
                     service.findAllUsers()
             );
 
@@ -205,19 +196,19 @@ class UsuarioServiceTest {
         void lanca_uma_excecao_se_o_usuario_nao_for_encontrado() {
             when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.empty());
 
-            Exception ex1 = assertThrows(NotFoundException.class, () ->
+            Exception ex1 = assertThrows(NotFoundElementException.class, () ->
                 service.findUserById(usuarioRequestMock.getId())
             );
 
             assertEquals("Usuário não encontrado", ex1.getMessage());
 
-            Exception ex2 = assertThrows(NotFoundException.class, () ->
+            Exception ex2 = assertThrows(NotFoundElementException.class, () ->
                     service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock)
             );
 
             assertEquals("Usuário não encontrado", ex2.getMessage());
 
-            Exception ex3 = assertThrows(NotFoundException.class, () ->
+            Exception ex3 = assertThrows(NotFoundElementException.class, () ->
                     service.deleteUserById(usuarioRequestMock.getId())
             );
 

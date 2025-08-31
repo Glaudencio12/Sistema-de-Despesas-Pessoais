@@ -3,7 +3,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundException;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
@@ -44,7 +44,7 @@ public class UsuarioService {
 
     public UsuarioResponseDTO findUserById(Long id) {
         logger.info("Buscando usuário de ID: {}", id);
-        Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
         UsuarioResponseDTO dto = ObjectMapper.parseObject(usuario, UsuarioResponseDTO.class);
         linksHateoas.links(dto);
         return dto;
@@ -54,7 +54,7 @@ public class UsuarioService {
         logger.info("Buscando todos os usuários do banco");
         List<Usuario> usuarios = repository.findAll();
         if (usuarios.isEmpty()) {
-            throw new NotFoundException("Nenhum usuário encontrada no banco de dados");
+            throw new NotFoundElementException("Nenhum usuário encontrada no banco de dados");
         } else {
             List<UsuarioResponseDTO> dtos = ObjectMapper.parseObjects(usuarios, UsuarioResponseDTO.class);
             dtos.forEach(linksHateoas::links);
@@ -69,7 +69,7 @@ public class UsuarioService {
         if (emailUsuarioCadastrado != null) {
             throw new EmailCannotBeDuplicatedException("O email fornecido já está cadastrado na base de dados");
         } else {
-            Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+            Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
 
             usuario.setNome(usuarioRequest.getNome().trim());
             usuario.setEmail(usuarioRequest.getEmail().trim());
@@ -82,7 +82,7 @@ public class UsuarioService {
 
     public void deleteUserById(Long id) {
         logger.info("Excluindo o usuário de id {} do banco de dados", id);
-        Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
         repository.delete(usuario);
     }
 }

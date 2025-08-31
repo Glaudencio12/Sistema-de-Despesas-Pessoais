@@ -2,7 +2,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.LancamentoRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoResponseDTO;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundException;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.LancamentoMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
@@ -39,11 +39,11 @@ public class LancamentoService {
 
     public LancamentoResponseDTO createLaunch(LancamentoRequestDTO lancamento) {
         logger.info("Registrando um lançamento do tipo {}", lancamento.getTipo());
-        Usuario usuario = usuarioRepository.findById(lancamento.getUsuarioId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        Usuario usuario = usuarioRepository.findById(lancamento.getUsuarioId()).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
         Categoria categoria = categoriaRepository.findByNome(lancamento.getCategoria());
 
         if (categoria == null || !lancamento.getTipo().equals(categoria.getTipo())) {
-            throw new NotFoundException("Categoria não encontrada");
+            throw new NotFoundElementException("Categoria não encontrada");
         }
 
         Lancamento entidade = ObjectMapper.parseObject(lancamento, Lancamento.class);
@@ -60,7 +60,7 @@ public class LancamentoService {
 
     public LancamentoResponseDTO findLaunchById(Long id) {
         logger.info("Buscando um lançamento com id {}", id);
-        Lancamento lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new NotFoundException("Lançamento não encontrado"));
+        Lancamento lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new NotFoundElementException("Lançamento não encontrado"));
         Lancamento salvo = lancamentoRepository.save(lancamento);
         LancamentoResponseDTO dto = LancamentoMapper.toResponseDTO(salvo);
         hateoasLinks.links(dto);
@@ -71,7 +71,7 @@ public class LancamentoService {
         logger.info("Buscando todos os lançamentos registrados");
         List<Lancamento> lancamentos = lancamentoRepository.findAll();
         if (lancamentos.isEmpty()) {
-            throw new NotFoundException("Nenhum lançameto encontrado");
+            throw new NotFoundElementException("Nenhum lançameto encontrado");
         }
 
         List<LancamentoResponseDTO> lancamentosDTO = new ArrayList<>();

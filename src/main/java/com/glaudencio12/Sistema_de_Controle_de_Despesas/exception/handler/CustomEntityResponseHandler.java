@@ -2,7 +2,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.handler;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.CategoryCannotBeDuplicateException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundException;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponse;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponseValidate;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.DataFormatada;
@@ -39,7 +39,7 @@ public class CustomEntityResponseHandler{
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(NotFoundElementException.class)
     public final ResponseEntity<ExceptionResponse> handlerUserNotFound(Exception ex, WebRequest request){
         ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

@@ -36,14 +36,14 @@ public class CategoriaController implements CategoriaControllerDocs {
     @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
     public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable("id") Long id){
-        CategoriaResponseDTO categoriaResponse = service.findCatgeoryById(id);
+        CategoriaResponseDTO categoriaResponse = service.findCategoryById(id);
         return ResponseEntity.ok(categoriaResponse);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
     public ResponseEntity<List<CategoriaResponseDTO>> findAll(){
-        List<CategoriaResponseDTO> categoriasResponse = service.findAllCatgorys();
+        List<CategoriaResponseDTO> categoriasResponse = service.findAllCategories();
         return ResponseEntity.ok(categoriasResponse);
     }
 
