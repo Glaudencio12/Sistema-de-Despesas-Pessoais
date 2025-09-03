@@ -24,7 +24,7 @@ services:
       start_period: 30s
 
   app:
-    image: glaudencio123/depesas-pessoais:v1.0.
+    image: glaudencio123/despesas-pessoais:v1.1
     container_name: api_controle_de_despesas
     ports:
       - "8080:8080"
