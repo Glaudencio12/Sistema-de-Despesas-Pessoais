@@ -297,7 +297,7 @@ mvn test -Dtest=UsuarioServiceTest
 - [ ] **Relatórios e Dashboards** financeiros
 - [ ] **Notificações** de lançamentos
 - [ ] **Importação/Exportação** de dados
-- [ ] **Métricas e Monitoramento** com Actuator
+- [✅] **Métricas e Monitoramento** com Actuator
 - [ ] **Testes de integração** completos
 
 ## Contribuição
