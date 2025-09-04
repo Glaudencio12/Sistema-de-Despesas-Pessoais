@@ -11,3 +11,13 @@ spring:
 logging:
   level:
     root: INFO
+#CONFIGURA O MONITORAMENTO DE DE SAÚDE E MÉTRICAS DA APLICAÇÃO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics
+  endpoint:
+    health:
+      show-details: always
+
