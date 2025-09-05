@@ -1,0 +1,12 @@
+# Configuração global para o Prometheus no container docker
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Configuração para raspar as métricas da aplicação
+scrape_configs:
+  - job_name: 'api_controle_de_despesas'
+    metrics_path: "/actuator/prometheus"
+    # O nome do serviço 'app' é usado como host, pois eles estão na mesma rede.
+    static_configs:
+      - targets: ['app:8080']
