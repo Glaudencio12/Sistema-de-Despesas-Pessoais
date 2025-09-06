@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -58,6 +59,18 @@ public class UsuarioController implements UsuarioControllerDocs {
         UsuarioResponseDTO usuarioResponse = service.updateUserById(id, usuarioRequest);
         return ResponseEntity.ok(usuarioResponse);
     }
+
+    @PatchMapping(
+            value = "/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
+    )
+    @Override
+    public ResponseEntity<UsuarioResponseDTO> updatePatch(@PathVariable("id") Long id, @RequestBody Map<String, Object> usuarioRequest) {
+        UsuarioResponseDTO usuarioResponse = service.updateSpecificFields(id, usuarioRequest);
+        return ResponseEntity.ok(usuarioResponse);
+    }
+
 
     @DeleteMapping("/{id}")
     @Override

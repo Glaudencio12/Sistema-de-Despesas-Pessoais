@@ -8,12 +8,17 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
+import org.apache.el.util.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class UsuarioService {
@@ -78,6 +83,32 @@ public class UsuarioService {
             linksHateoas.links(dto);
             return dto;
         }
+    }
+
+    public UsuarioResponseDTO updateSpecificFields(Long id, Map<String, Object> campos) {
+        logger.info("Atualizando o campo {} do usuário", campos.keySet());
+        Usuario usuarioCadastrado = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
+
+        Set<String> camposPermitidos = Set.of("email", "senha");
+
+        for (String chave : campos.keySet()) {
+            if (!camposPermitidos.contains(chave)) {
+                throw new IllegalArgumentException("Campo não pode ser atualizado, pois somente os seguintes campos podem: " + camposPermitidos);
+            }
+        }
+
+        campos.forEach((campo, valor) -> {
+            Field field = ReflectionUtils.findField(Usuario.class, campo);
+            if (!(valor instanceof String) || ((String) valor).isEmpty()) {
+                throw new IllegalArgumentException("Campo " + field.getName() + " não pode ser atualizado, pois precisa ser do tipo String e não pode ser nulo");
+            }
+            field.setAccessible(true);
+            ReflectionUtils.setField(field, usuarioCadastrado, valor);
+        });
+
+        UsuarioResponseDTO dto = ObjectMapper.parseObject(repository.save(usuarioCadastrado), UsuarioResponseDTO.class);
+        linksHateoas.links(dto);
+        return dto;
     }
 
     public void deleteUserById(Long id) {

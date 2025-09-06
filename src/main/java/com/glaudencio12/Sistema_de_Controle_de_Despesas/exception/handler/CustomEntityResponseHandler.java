@@ -44,4 +44,10 @@ public class CustomEntityResponseHandler{
         ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public final ResponseEntity<ExceptionResponse> handlerIllegalArgument(Exception e, WebRequest request){
+        ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), e.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }
