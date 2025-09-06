@@ -37,11 +37,14 @@ Sistema_de_Controle_de_Despesas/
 │   │   │   └── utils/                     # Utilitários
 │   │   └── resources/
 │   │       ├── application.yml            # Configurações da aplicação
+│   │       ├── application-dev.yml        # Configuração ambiente de dev
+│   │       ├── appplication-prod.yml      # Configuração ambiente de prod   
 │   │       └── db/migration/              # Migrações do banco
 │   └── test/                              # Testes unitários
 ├── Dockerfile                             # Configuração Docker
-├── compose.yaml                           # Docker Compose
+├── compose.yml                           # Docker Compose
 ├── pom.xml                               # Dependências Maven
+├── prometheus.yml                        # Configuração do prometheus para o container docker
 └── README.md                             # Este arquivo
 ```
 
@@ -189,7 +192,8 @@ MYSQL_ROOT_PASSWORD=senha_root_segura
 | `GET` | `/api/usuarios` | Listar todos os usuários | ✅ |
 | `GET` | `/api/usuarios/{id}` | Buscar usuário por ID | ✅ |
 | `PUT` | `/api/usuarios/{id}` | Atualizar usuário | ✅ |
-| `DELETE` | `/api/usuarios/{id}` | Deletar usuário | ✅ |
+ | `PATCH` | `/api/usuarios/{id}` | Atualizar dados parcialmente | ✅ |
+ | `DELETE` | `/api/usuarios/{id}` | Deletar usuário | ✅ |
 
 ### Categorias (`/api/categorias`)
 
