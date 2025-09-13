@@ -1,0 +1,8 @@
+CREATE TABLE logs(
+    id_log BIGINT AUTO_INCREMENT PRIMARY KEY,
+    tabela_afetada VARCHAR(100) NOT NULL,
+    operacao ENUM('INSERT', 'UPDATE', 'DELETE') NOT NULL,
+    registro_id BIGINT NOT NULL,
+    data_operacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    detalhes VARCHAR(150) NOT NULL
+);

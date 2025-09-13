@@ -1,0 +1,1 @@
+ALTER TABLE logs MODIFY detalhes TEXT;
