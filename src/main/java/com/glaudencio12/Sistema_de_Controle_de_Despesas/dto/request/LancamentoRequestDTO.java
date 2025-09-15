@@ -1,12 +1,13 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancamentoCategoria;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
 public class LancamentoRequestDTO {
     private Long id;
 

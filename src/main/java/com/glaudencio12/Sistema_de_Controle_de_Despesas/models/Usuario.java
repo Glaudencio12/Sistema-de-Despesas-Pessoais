@@ -1,9 +1,7 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,7 +9,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "usuario")
-@Data
+@Getter
+@Setter
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +29,9 @@ public class Usuario {
     private LocalDate dataCadastro;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<Categoria> categorias = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<Lancamento> lancamentos = new ArrayList<>();
 
 }

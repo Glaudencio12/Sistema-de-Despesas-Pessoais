@@ -89,7 +89,7 @@ public class UsuarioService {
         logger.info("Atualizando o campo {} do usuário", campos.keySet());
         Usuario usuarioCadastrado = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
 
-        Set<String> camposPermitidos = Set.of("email", "senha");
+        Set<String> camposPermitidos = Set.of("nome","email", "senha");
 
         for (String chave : campos.keySet()) {
             if (!camposPermitidos.contains(chave)) {

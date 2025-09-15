@@ -2,16 +2,15 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.models;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancamentoCategoria;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lancamento")
-@Data
+@Getter
+@Setter
 public class Lancamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,14 +30,10 @@ public class Lancamento {
     private TipoLancamentoCategoria tipo;
 
     @ManyToOne
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "categoria_id", referencedColumnName = "id")
     private Categoria categoria;
 
     @ManyToOne
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
 }

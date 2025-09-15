@@ -25,7 +25,6 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    @PostMapping(consumes = "application/json", produces = "application/json")
     ResponseEntity<CategoriaResponseDTO> create(@RequestBody CategoriaRequestDTO categoriaRequest);
 
     @Operation(summary = "Busca uma categoria", description = "Recupera os detalhes de uma categoria a partir do seu ID.", tags = { "Categorias" },
@@ -38,7 +37,6 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    @GetMapping(value = "/{id}", produces = "application/json")
     ResponseEntity<CategoriaResponseDTO> findById(@Parameter(description = "ID da categoria", example = "1") @PathVariable("id") Long id);
 
     @Operation(summary = "Lista todas as categorias", description = "Lista todas as categorias cadastradas pelo usuário.", tags = { "Categorias" },
@@ -51,7 +49,6 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    @GetMapping(produces = "application/json")
     ResponseEntity<List<CategoriaResponseDTO>> findAll();
 
     @Operation(summary = "Exclui uma categoria", description = "Remove uma categoria a partir do seu ID.", tags = { "Categorias" },

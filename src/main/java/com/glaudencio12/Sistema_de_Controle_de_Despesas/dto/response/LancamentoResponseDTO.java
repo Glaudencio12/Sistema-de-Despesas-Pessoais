@@ -31,6 +31,6 @@ public class LancamentoResponseDTO extends RepresentationModel<LancamentoRespons
     private String categoria;
     @JsonProperty("lancado_por")
     private String nomeUsuario;
-    @JsonProperty("email_de_quem_lancou")
+    @JsonProperty("email_do_responsavel")
     private String emailUsuario;
 }

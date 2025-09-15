@@ -2,16 +2,15 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.models;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancamentoCategoria;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "categoria")
-@Data
+@Getter
+@Setter
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,14 +24,9 @@ public class Categoria {
     private TipoLancamentoCategoria tipo;
 
     @ManyToOne
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
 
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<Lancamento> lancamentos = new ArrayList<>();
-
 }
