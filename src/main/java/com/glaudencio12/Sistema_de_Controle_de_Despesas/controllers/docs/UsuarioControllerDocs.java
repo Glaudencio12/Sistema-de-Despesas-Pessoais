@@ -9,6 +9,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +59,14 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content)
             }
     )
-    ResponseEntity<List<UsuarioResponseDTO>> findAll();
+    ResponseEntity<PagedModel<EntityModel<UsuarioResponseDTO>>> findAll(
+            @PageableDefault(
+                    page = 0,
+                    size = 12,
+                    direction = Sort.Direction.ASC,
+                    sort = "nome"
+            )Pageable pageable
+    );
 
     @Operation(summary = "Atualiza usuário", description = "Atualiza os dados de um usuário existente pelo ID", tags = { "Usuários" },
             responses = {

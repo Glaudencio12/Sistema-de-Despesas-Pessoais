@@ -6,6 +6,11 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaRe
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.CategoriaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +47,15 @@ public class CategoriaController implements CategoriaControllerDocs {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    public ResponseEntity<List<CategoriaResponseDTO>> findAll(){
-        List<CategoriaResponseDTO> categoriasResponse = service.findAllCategories();
+    public ResponseEntity<PagedModel<EntityModel<CategoriaResponseDTO>>> findAll(
+            @PageableDefault(
+                    page = 0,
+                    size = 12,
+                    direction = Sort.Direction.ASC,
+                    sort = "data"
+            ) Pageable pageable
+    ){
+        PagedModel<EntityModel<CategoriaResponseDTO>> categoriasResponse = service.findAllCategories(pageable);
         return ResponseEntity.ok(categoriasResponse);
     }
 

@@ -6,13 +6,14 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoR
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.LancamentoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/lancamentos")
@@ -43,8 +44,8 @@ public class LancamentoController implements LancamentoControllerDocs {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    public ResponseEntity<List<LancamentoResponseDTO>> findAll(){
-        List<LancamentoResponseDTO> lancamentosResponse = service.findAllLaunches();
+    public ResponseEntity<PagedModel<EntityModel<LancamentoResponseDTO>>> findAll(Pageable pageable){
+        PagedModel<EntityModel<LancamentoResponseDTO>> lancamentosResponse = service.findAllLaunches(pageable);
         return ResponseEntity.ok(lancamentosResponse);
     }
 }

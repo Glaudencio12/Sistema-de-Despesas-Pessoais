@@ -4,7 +4,6 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.LancamentoRe
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.LancamentoMapper;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Lancamento;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
@@ -13,13 +12,17 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.LancamentoRep
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.DataFormatada;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class LancamentoService {
@@ -29,12 +32,23 @@ public class LancamentoService {
     private final HateoasLinks hateoasLinks;
     private final UsuarioRepository usuarioRepository;
     private final CategoriaRepository categoriaRepository;
+    private final ModelMapper modelMapper;
+    private final PagedResourcesAssembler<LancamentoResponseDTO> assembler;
 
-    public LancamentoService(LancamentoRepository repository, HateoasLinks hateoasLinks, UsuarioRepository usuarioRepository, CategoriaRepository categoriaRepository) {
+    public LancamentoService(
+            LancamentoRepository repository,
+            HateoasLinks hateoasLinks,
+            UsuarioRepository usuarioRepository,
+            CategoriaRepository categoriaRepository,
+            ModelMapper modelMapper,
+            PagedResourcesAssembler<LancamentoResponseDTO> assembler
+    ) {
         this.lancamentoRepository = repository;
         this.hateoasLinks = hateoasLinks;
         this.usuarioRepository = usuarioRepository;
         this.categoriaRepository = categoriaRepository;
+        this.modelMapper = modelMapper;
+        this.assembler = assembler;
     }
 
     public LancamentoResponseDTO createLaunch(LancamentoRequestDTO lancamento) {
@@ -46,7 +60,7 @@ public class LancamentoService {
             throw new NotFoundElementException("Categoria não encontrada");
         }
 
-        Lancamento entidade = ObjectMapper.parseObject(lancamento, Lancamento.class);
+        Lancamento entidade = modelMapper.map(lancamento, Lancamento.class);
         entidade.setData(LocalDateTime.now());
         entidade.setUsuario(usuario);
         entidade.setCategoria(categoria);
@@ -67,16 +81,18 @@ public class LancamentoService {
         return dto;
     }
 
-    public List<LancamentoResponseDTO> findAllLaunches() {
+    public PagedModel<EntityModel<LancamentoResponseDTO>> findAllLaunches(Pageable pageable) {
         logger.info("Buscando todos os lançamentos registrados");
-        List<Lancamento> lancamentos = lancamentoRepository.findAll();
+        Page<Lancamento> lancamentos = lancamentoRepository.findAll(pageable);
         if (lancamentos.isEmpty()) {
             throw new NotFoundElementException("Nenhum lançameto encontrado");
+        } else {
+            Page<LancamentoResponseDTO> lancamentoResponse = lancamentos.map(lancamento -> {
+                var lancamentoDTO = LancamentoMapper.toResponseDTO(lancamento);
+                hateoasLinks.links(lancamentoDTO);
+                return lancamentoDTO;
+            });
+            return assembler.toModel(lancamentoResponse);
         }
-
-        List<LancamentoResponseDTO> lancamentosDTO = new ArrayList<>();
-        lancamentos.forEach(lancamento -> lancamentosDTO.add(LancamentoMapper.toResponseDTO(lancamento)));
-        lancamentosDTO.forEach(hateoasLinks::links);
-        return lancamentosDTO;
     }
 }

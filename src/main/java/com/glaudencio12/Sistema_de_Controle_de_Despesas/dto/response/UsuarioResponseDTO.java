@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.time.LocalDate;
 
@@ -17,6 +18,7 @@ import java.time.LocalDate;
         "data_cadastro",
         "links"
 })
+@Relation(collectionRelation = "Usuario")
 public class UsuarioResponseDTO extends RepresentationModel<UsuarioResponseDTO> {
     private Long id;
     private String nome;

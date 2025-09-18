@@ -8,6 +8,11 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +54,14 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    ResponseEntity<List<CategoriaResponseDTO>> findAll();
+    ResponseEntity<PagedModel<EntityModel<CategoriaResponseDTO>>> findAll(
+            @PageableDefault(
+                    page = 0,
+                    size = 12,
+                    direction = Sort.Direction.ASC,
+                    sort = "data"
+            )Pageable pageable
+    );
 
     @Operation(summary = "Exclui uma categoria", description = "Remove uma categoria a partir do seu ID.", tags = { "Categorias" },
             responses = {

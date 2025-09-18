@@ -6,3 +6,4 @@ CREATE TABLE logs(
     data_operacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     detalhes VARCHAR(150) NOT NULL
 );
+

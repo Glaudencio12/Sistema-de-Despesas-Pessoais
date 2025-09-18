@@ -4,19 +4,22 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioReque
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
-import org.apache.el.util.ReflectionUtil;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,10 +29,14 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final HateoasLinks linksHateoas;
+    private final ModelMapper modelMapper;
+    private final PagedResourcesAssembler<UsuarioResponseDTO> assembler;
 
-    public UsuarioService(UsuarioRepository repository, HateoasLinks links) {
+    public UsuarioService(UsuarioRepository repository, HateoasLinks links, ModelMapper modelMapper, PagedResourcesAssembler<UsuarioResponseDTO> assembler) {
         this.repository = repository;
         this.linksHateoas = links;
+        this.modelMapper = modelMapper;
+        this.assembler = assembler;
     }
 
     public UsuarioResponseDTO createUser(UsuarioRequestDTO usuarioRequest) {
@@ -40,8 +47,8 @@ public class UsuarioService {
             throw new EmailCannotBeDuplicatedException("O email fornecido já está cadastrado na base de dados");
         } else {
             usuarioRequest.setDataCadastro(LocalDate.now());
-            Usuario entidade = repository.save(ObjectMapper.parseObject(usuarioRequest, Usuario.class));
-            UsuarioResponseDTO dto = ObjectMapper.parseObject(entidade, UsuarioResponseDTO.class);
+            Usuario entidade = repository.save(modelMapper.map(usuarioRequest, Usuario.class));
+            UsuarioResponseDTO dto = modelMapper.map(entidade, UsuarioResponseDTO.class);
             linksHateoas.links(dto);
             return dto;
         }
@@ -50,20 +57,23 @@ public class UsuarioService {
     public UsuarioResponseDTO findUserById(Long id) {
         logger.info("Buscando usuário de ID: {}", id);
         Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
-        UsuarioResponseDTO dto = ObjectMapper.parseObject(usuario, UsuarioResponseDTO.class);
+        UsuarioResponseDTO dto = modelMapper.map(usuario, UsuarioResponseDTO.class);
         linksHateoas.links(dto);
         return dto;
     }
 
-    public List<UsuarioResponseDTO> findAllUsers() {
+    public PagedModel<EntityModel<UsuarioResponseDTO>> findAllUsers(Pageable pageable) {
         logger.info("Buscando todos os usuários do banco");
-        List<Usuario> usuarios = repository.findAll();
+        Page<Usuario> usuarios = repository.findAll(pageable);
         if (usuarios.isEmpty()) {
             throw new NotFoundElementException("Nenhum usuário encontrada no banco de dados");
         } else {
-            List<UsuarioResponseDTO> dtos = ObjectMapper.parseObjects(usuarios, UsuarioResponseDTO.class);
-            dtos.forEach(linksHateoas::links);
-            return dtos;
+            Page<UsuarioResponseDTO> usuarioResponse = usuarios.map(usuario -> {
+                var usuarioDTO = modelMapper.map(usuario, UsuarioResponseDTO.class);
+                linksHateoas.links(usuarioDTO);
+                return usuarioDTO;
+            });
+            return assembler.toModel(usuarioResponse);
         }
     }
 
@@ -79,7 +89,7 @@ public class UsuarioService {
             usuario.setNome(usuarioRequest.getNome().trim());
             usuario.setEmail(usuarioRequest.getEmail().trim());
             usuario.setSenha(usuarioRequest.getSenha().trim());
-            UsuarioResponseDTO dto = ObjectMapper.parseObject(repository.save(usuario), UsuarioResponseDTO.class);
+            UsuarioResponseDTO dto = modelMapper.map(repository.save(usuario), UsuarioResponseDTO.class);
             linksHateoas.links(dto);
             return dto;
         }
@@ -89,7 +99,7 @@ public class UsuarioService {
         logger.info("Atualizando o campo {} do usuário", campos.keySet());
         Usuario usuarioCadastrado = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
 
-        Set<String> camposPermitidos = Set.of("nome","email", "senha");
+        Set<String> camposPermitidos = Set.of("nome", "email", "senha");
 
         for (String chave : campos.keySet()) {
             if (!camposPermitidos.contains(chave)) {
@@ -106,7 +116,7 @@ public class UsuarioService {
             ReflectionUtils.setField(field, usuarioCadastrado, valor);
         });
 
-        UsuarioResponseDTO dto = ObjectMapper.parseObject(repository.save(usuarioCadastrado), UsuarioResponseDTO.class);
+        UsuarioResponseDTO dto = modelMapper.map(repository.save(usuarioCadastrado), UsuarioResponseDTO.class);
         linksHateoas.links(dto);
         return dto;
     }

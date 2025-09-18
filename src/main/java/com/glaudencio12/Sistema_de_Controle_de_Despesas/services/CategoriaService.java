@@ -4,16 +4,22 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.CategoriaReq
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.CategoryCannotBeDuplicateException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.ObjectMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.CategoriaRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoriaService {
@@ -22,11 +28,15 @@ public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
     private final HateoasLinks hateoasLinks;
+    private final ModelMapper modelMapper;
+    private final PagedResourcesAssembler<CategoriaResponseDTO> assembler;
 
-    public CategoriaService(CategoriaRepository repository, UsuarioRepository usuarioRepository, HateoasLinks hateoasLinks) {
+    public CategoriaService(CategoriaRepository repository, UsuarioRepository usuarioRepository, HateoasLinks hateoasLinks, ModelMapper modelMapper, PagedResourcesAssembler<CategoriaResponseDTO> assembler) {
         this.categoriaRepository = repository;
         this.usuarioRepository = usuarioRepository;
         this.hateoasLinks = hateoasLinks;
+        this.modelMapper = modelMapper;
+        this.assembler = assembler;
     }
 
     public CategoriaResponseDTO createCategory(CategoriaRequestDTO categoriaRequest) {
@@ -37,8 +47,8 @@ public class CategoriaService {
         if (categoriaCadastrada != null) {
             throw new CategoryCannotBeDuplicateException("A categoria fornecida já está cadastrada na base de dados");
         } else {
-            Categoria entidade = categoriaRepository.save(ObjectMapper.parseObject(categoriaRequest, Categoria.class));
-            CategoriaResponseDTO dto = ObjectMapper.parseObject(entidade, CategoriaResponseDTO.class);
+            Categoria entidade = categoriaRepository.save(modelMapper.map(categoriaRequest, Categoria.class));
+            CategoriaResponseDTO dto = modelMapper.map(entidade, CategoriaResponseDTO.class);
             hateoasLinks.links(dto);
             return dto;
         }
@@ -48,20 +58,23 @@ public class CategoriaService {
         logger.info("Iniciando a busca da categoria com id {}", id);
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundElementException("Categoria não encontrada"));
-        CategoriaResponseDTO dto = ObjectMapper.parseObject(categoria, CategoriaResponseDTO.class);
+        CategoriaResponseDTO dto = modelMapper.map(categoria, CategoriaResponseDTO.class);
         hateoasLinks.links(dto);
         return dto;
     }
 
-    public List<CategoriaResponseDTO> findAllCategories() {
+    public PagedModel<EntityModel<CategoriaResponseDTO>> findAllCategories(Pageable pageable) {
         logger.info("Buscando todas as categorias no banco");
-        List<Categoria> categorias = categoriaRepository.findAll();
+        Page<Categoria> categorias = categoriaRepository.findAll(pageable);
         if (categorias.isEmpty()) {
             throw new NotFoundElementException("Nenhuma categoria encontrada");
         } else {
-            List<CategoriaResponseDTO> dtos = ObjectMapper.parseObjects(categorias, CategoriaResponseDTO.class);
-            dtos.forEach(hateoasLinks::links);
-            return dtos;
+            Page<CategoriaResponseDTO> categoriaResponse = categorias.map(categoria -> {
+                var categoriaDTO = modelMapper.map(categoria, CategoriaResponseDTO.class);
+                hateoasLinks.links(categoriaDTO);
+                return categoriaDTO;
+            });
+            return assembler.toModel(categoriaResponse);
         }
     }
 

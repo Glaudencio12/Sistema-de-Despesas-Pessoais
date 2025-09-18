@@ -6,6 +6,7 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancame
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.math.BigDecimal;
 
@@ -19,9 +20,10 @@ import java.math.BigDecimal;
         "categoria",
         "descricao",
         "lancado_por",
-        "email_de_quem_lancou",
+        "email_do_responsavel",
         "links"
 })
+@Relation(collectionRelation = "Lancamento")
 public class LancamentoResponseDTO extends RepresentationModel<LancamentoResponseDTO> {
     private Long id;
     private String descricao;

@@ -8,11 +8,15 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
 
 public interface LancamentoControllerDocs {
 
@@ -50,5 +54,13 @@ public interface LancamentoControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    ResponseEntity<List<LancamentoResponseDTO>> findAll();
+    ResponseEntity<PagedModel<EntityModel<LancamentoResponseDTO>>> findAll(
+            @PageableDefault(
+                    page = 0,
+                    size = 12,
+                    direction = Sort.Direction.ASC,
+                    sort = "data"
+            )Pageable pageable
+    );
 }
+

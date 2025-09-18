@@ -6,6 +6,10 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResp
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.UsuarioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +48,8 @@ public class UsuarioController implements UsuarioControllerDocs {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
-        List<UsuarioResponseDTO> usuarios = service.findAllUsers();
+    public ResponseEntity<PagedModel<EntityModel<UsuarioResponseDTO>>> findAll(Pageable pageable) {
+        PagedModel<EntityModel<UsuarioResponseDTO>> usuarios = service.findAllUsers(pageable);
         return ResponseEntity.ok(usuarios);
     }
 
