@@ -16,6 +16,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +47,12 @@ class CategoriaServiceTest {
     HateoasLinks hateoasLinks;
 
     @Mock
+    ModelMapper modelMapper;
+
+    @Mock
+    PagedResourcesAssembler<CategoriaResponseDTO> assembler;
+
+    @Mock
     UsuarioService usuarioService;
 
     @InjectMocks
@@ -47,6 +61,7 @@ class CategoriaServiceTest {
     Usuario usuario;
     Categoria categoria;
     CategoriaRequestDTO categoriaRequest;
+    CategoriaResponseDTO categoriaResponse;
     List<Categoria> categoriaList;
 
     @BeforeEach
@@ -55,6 +70,7 @@ class CategoriaServiceTest {
         categoria = StubsCategoria.categoriaEntidade();
         categoriaList = StubsCategoria.categoriaEntidadeList();
         categoriaRequest = StubsCategoria.categoriaRequest();
+        categoriaResponse = StubsCategoria.categoriaResponse();
         categoriaList = StubsCategoria.categoriaEntidadeList();
     }
 
@@ -71,6 +87,8 @@ class CategoriaServiceTest {
     void cria_uma_categoria() {
         when(categoriaRepository.findByNome(categoriaRequest.getNome())).thenReturn(null);
         when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(modelMapper.map(any(CategoriaRequestDTO.class), eq(Categoria.class))).thenReturn(categoria);
+        when(modelMapper.map(any(Categoria.class), eq(CategoriaResponseDTO.class))).thenReturn(categoriaResponse);
         when(categoriaRepository.save(any(Categoria.class))).thenReturn(categoria);
         doCallRealMethod().when(hateoasLinks).links(any(CategoriaResponseDTO.class));
 
@@ -81,6 +99,9 @@ class CategoriaServiceTest {
         verify(usuarioRepository, atLeastOnce()).findById(anyLong());
         verify(categoriaRepository, atLeastOnce()).save(any(Categoria.class));
         verify(hateoasLinks, atLeastOnce()).links(any(CategoriaResponseDTO.class));
+        verify(modelMapper, times(1)).map(any(Categoria.class), eq(CategoriaResponseDTO.class));
+        verify(modelMapper, times(1)).map(any(CategoriaRequestDTO.class), eq(Categoria.class));
+
 
         verificarLinks(resposta, "FindCategoryById", "/api/categorias/1", "GET");
         verificarLinks(resposta, "FindAllCategorys", "/api/categorias", "GET");
@@ -92,6 +113,8 @@ class CategoriaServiceTest {
     @DisplayName("Deve buscar uma categoria existente pelo id")
     void busca_uma_categoria() {
         when(categoriaRepository.findById(anyLong())).thenReturn(Optional.of(categoria));
+        when(modelMapper.map(any(Categoria.class), eq(CategoriaResponseDTO.class))).thenReturn(categoriaResponse);
+
         doCallRealMethod().when(hateoasLinks).links(any(CategoriaResponseDTO.class));
 
         CategoriaResponseDTO resposta = categoriaService.findCategoryById(anyLong());
@@ -100,6 +123,7 @@ class CategoriaServiceTest {
         assertNotNull(resposta.getLinks());
         verify(categoriaRepository, atLeastOnce()).findById(anyLong());
         verify(hateoasLinks, atLeastOnce()).links(any(CategoriaResponseDTO.class));
+        verify(modelMapper, times(1)).map(any(Categoria.class), eq(CategoriaResponseDTO.class));
 
         verificarLinks(resposta, "FindCategoryById", "/api/categorias/1", "GET");
         verificarLinks(resposta, "FindAllCategorys", "/api/categorias", "GET");
@@ -109,28 +133,31 @@ class CategoriaServiceTest {
 
     @Test
     @DisplayName("Deve buscar todas as categorias cadastradas")
-    @Disabled
     void busca_todas_as_categorias() {
-        when(categoriaRepository.findAll()).thenReturn(categoriaList);
-        doCallRealMethod().when(hateoasLinks).links(any(CategoriaResponseDTO.class));
+        Pageable pageable = PageRequest.of(0,10);
+        Page<Categoria> page = new PageImpl<>(categoriaList);
 
-        List<CategoriaResponseDTO> respostas = new ArrayList<>();// categoriaService.findAllCategories();
+        when(categoriaRepository.findAll(pageable)).thenReturn(page);
+        when(modelMapper.map(any(Categoria.class), eq(CategoriaResponseDTO.class))).thenReturn(categoriaResponse);
+        doNothing().when(hateoasLinks).links(any(CategoriaResponseDTO.class));
 
-        assertEquals(3, respostas.size());
-        verify(categoriaRepository, atLeastOnce()).findAll();
-        verify(hateoasLinks, times(3)).links(any(CategoriaResponseDTO.class));
+        List<CategoriaResponseDTO> categoriaDTO = page.stream().map(categoria -> modelMapper.map(categoria, CategoriaResponseDTO.class)).toList();
 
-        CategoriaResponseDTO resposta1 = respostas.getFirst();
-        verificarLinks(resposta1, "FindCategoryById", "/api/categorias/1", "GET");
-        verificarLinks(resposta1, "FindAllCategorys", "/api/categorias", "GET");
-        verificarLinks(resposta1, "CreateCategory", "/api/categorias", "POST");
-        verificarLinks(resposta1, "DeleteCategory", "/api/categorias/Categoria%20teste", "DELETE");
+        PagedModel<EntityModel<CategoriaResponseDTO>> pagedModel = PagedModel.of(
+                categoriaDTO.stream().map(EntityModel::of).toList(),
+                new PagedModel.PageMetadata(10, 0, categoriaDTO.size())
+        );
 
-        CategoriaResponseDTO resposta2 = respostas.get(1);
-        verificarLinks(resposta2, "FindCategoryById", "/api/categorias/1", "GET");
-        verificarLinks(resposta2, "FindAllCategorys", "/api/categorias", "GET");
-        verificarLinks(resposta2, "CreateCategory", "/api/categorias", "POST");
-        verificarLinks(resposta2, "DeleteCategory", "/api/categorias/Categoria%20teste", "DELETE");
+        when(assembler.toModel(any(Page.class))).thenReturn(pagedModel);
+
+        PagedModel<EntityModel<CategoriaResponseDTO>> resposta = categoriaService.findAllCategories(pageable);
+
+        assertNotNull(resposta);
+        assertEquals(10, resposta.getContent().size());
+        verify(categoriaRepository).findAll(pageable);
+        verify(hateoasLinks, times(10)).links(any(CategoriaResponseDTO.class));
+        verify(modelMapper, times(20)).map(any(Categoria.class), eq(CategoriaResponseDTO.class));
+        verify(assembler).toModel(any(Page.class));
     }
 
     @Test
@@ -160,7 +187,6 @@ class CategoriaServiceTest {
 
     @Nested
     @DisplayName("Testes de exceção quando elementos não são encontrados")
-    @Disabled
     class NotFound {
 
         @Test
@@ -187,11 +213,13 @@ class CategoriaServiceTest {
             );
             assertEquals("A categoria fornecida não foi cadastrada", ex3.getMessage());
 
-            //when(categoriaRepository.findAll()).thenReturn(List.of());
-            //Exception ex4 = assertThrows(NotFoundElementException.class,
-              //      () -> categoriaService.findAllCategories()
-            //);
-            //assertEquals("Nenhuma categoria encontrada", ex4.getMessage());
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<Categoria> page = Page.empty();
+            when(categoriaRepository.findAll(pageable)).thenReturn(page);
+            Exception ex4 = assertThrows(NotFoundElementException.class,
+                   () -> categoriaService.findAllCategories(pageable)
+            );
+            assertEquals("Nenhuma categoria encontrada", ex4.getMessage());
         }
     }
 

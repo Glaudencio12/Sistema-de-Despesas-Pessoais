@@ -13,8 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.*;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,21 +36,29 @@ class UsuarioServiceTest {
     @Mock
     HateoasLinks hateoasLinks;
 
+    @Mock
+    ModelMapper modelMapper;
+
+    @Mock
+    PagedResourcesAssembler<UsuarioResponseDTO> assembler;
+
     @InjectMocks
     UsuarioService service;
 
     Usuario usuarioEntidade;
     UsuarioRequestDTO usuarioRequestMock;
+    UsuarioResponseDTO usuarioResponseMock;
     List<Usuario> usuarioEntidadeList;
 
     @BeforeEach
     void setUp() {
-        usuarioRequestMock = (UsuarioRequestDTO) StubsUsuario.usuarioRequest();
-        usuarioEntidade = (Usuario) StubsUsuario.usuarioEntidade();
+        usuarioRequestMock = StubsUsuario.usuarioRequest();
+        usuarioResponseMock = StubsUsuario.usuarioResponse();
+        usuarioEntidade = StubsUsuario.usuarioEntidade();
         usuarioEntidadeList = StubsUsuario.usuarioEntidadeList();
     }
 
-    public static void links(UsuarioResponseDTO dto, String rel, String href, String type){
+    public static void links(UsuarioResponseDTO dto, String rel, String href, String type) {
         assertTrue(dto.getLinks().stream().anyMatch(link ->
                 link.getRel().value().equals(rel) &
                 link.getHref().endsWith(href) &
@@ -59,6 +71,8 @@ class UsuarioServiceTest {
     void cria_um_usuario_no_banco() {
         when(repository.findByEmail(usuarioRequestMock.getEmail())).thenReturn(null);
         when(repository.save(any(Usuario.class))).thenReturn(usuarioEntidade);
+        when(modelMapper.map(any(UsuarioRequestDTO.class), eq(Usuario.class))).thenReturn(usuarioEntidade);
+        when(modelMapper.map(any(Usuario.class), eq(UsuarioResponseDTO.class))).thenReturn(usuarioResponseMock);
         doCallRealMethod().when(hateoasLinks).links(any(UsuarioResponseDTO.class));
 
         UsuarioResponseDTO resposta = service.createUser(usuarioRequestMock);
@@ -68,12 +82,16 @@ class UsuarioServiceTest {
         verify(repository, atLeastOnce()).findByEmail(usuarioRequestMock.getEmail());
         verify(repository, atLeastOnce()).save(any(Usuario.class));
         verify(hateoasLinks, times(1)).links(any(UsuarioResponseDTO.class));
+        verify(modelMapper, times(1)).map(any(UsuarioRequestDTO.class), eq(Usuario.class));
+        verify(modelMapper, times(1)).map(any(Usuario.class), eq(UsuarioResponseDTO.class));
+
     }
 
     @Test
     @DisplayName("Busca um usuário por ID")
     void busca_um_usuario_no_banco_pelo_id() {
         when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.of(usuarioEntidade));
+        when(modelMapper.map(any(Usuario.class), eq(UsuarioResponseDTO.class))).thenReturn(usuarioResponseMock);
         doCallRealMethod().when(hateoasLinks).links(any(UsuarioResponseDTO.class));
 
         UsuarioResponseDTO resposta = service.findUserById(usuarioRequestMock.getId());
@@ -83,6 +101,8 @@ class UsuarioServiceTest {
         assertNotNull(resposta.getId());
         verify(repository, atLeastOnce()).findById(usuarioRequestMock.getId());
         verify(hateoasLinks, times(1)).links(any(UsuarioResponseDTO.class));
+        verify(modelMapper, times(1)).map(any(Usuario.class), eq(UsuarioResponseDTO.class));
+
 
         links(resposta, "FindUserById", "/api/usuarios/1", "GET");
         links(resposta, "FindAllUsers", "/api/usuarios", "GET");
@@ -93,31 +113,32 @@ class UsuarioServiceTest {
 
     @Test
     @DisplayName("Busca todos os usuários cadastrados no banco")
-    @Disabled
     void busca_todos_os_usuarios_cadastrados() {
-        when(repository.findAll()).thenReturn(usuarioEntidadeList);
-        doCallRealMethod().when(hateoasLinks).links(any(UsuarioResponseDTO.class));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Usuario> page = new PageImpl<>(usuarioEntidadeList);
 
-        List<UsuarioResponseDTO> resposta = new ArrayList<>();//service.findAllUsers();
+        when(repository.findAll(pageable)).thenReturn(page);
+        when(modelMapper.map(any(Usuario.class), eq(UsuarioResponseDTO.class))).thenReturn(usuarioResponseMock);
+        doNothing().when(hateoasLinks).links(any(UsuarioResponseDTO.class));
 
-        assertNotNull(resposta);
-        assertEquals(3, resposta.size());
-        verify(repository, atLeastOnce()).findAll();
-        verify(hateoasLinks, times(3)).links(any(UsuarioResponseDTO.class));
+        List<UsuarioResponseDTO> usuarioDTO = page.stream().map(usuario -> modelMapper.map(usuario, UsuarioResponseDTO.class)).toList();
 
-        UsuarioResponseDTO usuario1 = resposta.getFirst();
-        links(usuario1, "FindUserById", "/api/usuarios/1", "GET");
-        links(usuario1, "FindAllUsers", "/api/usuarios", "GET");
-        links(usuario1, "CreateUser", "/api/usuarios", "POST");
-        links(usuario1, "UpdateUserById", "/api/usuarios/1", "PUT");
-        links(usuario1, "DeleteUser", "/api/usuarios/1", "DELETE");
+        PagedModel<EntityModel<UsuarioResponseDTO>> pagedModel =
+                PagedModel.of(
+                        usuarioDTO.stream().map(EntityModel::of).toList(),
+                        new PagedModel.PageMetadata(10, 0, usuarioDTO.size())
+                );
 
-        UsuarioResponseDTO usuario2 = resposta.getLast();
-        links(usuario2, "FindUserById", "/api/usuarios/3", "GET");
-        links(usuario2, "FindAllUsers", "/api/usuarios", "GET");
-        links(usuario2, "CreateUser", "/api/usuarios", "POST");
-        links(usuario2, "UpdateUserById", "/api/usuarios/3", "PUT");
-        links(usuario2, "DeleteUser", "/api/usuarios/3", "DELETE");
+        when(assembler.toModel(any(Page.class))).thenReturn(pagedModel);
+
+        PagedModel<EntityModel<UsuarioResponseDTO>> respostaPagedModel = service.findAllUsers(pageable);
+
+        assertNotNull(respostaPagedModel);
+        assertEquals(10, respostaPagedModel.getContent().size());
+        verify(repository).findAll(pageable);
+        verify(modelMapper, times(20)).map(any(Usuario.class), eq(UsuarioResponseDTO.class));
+        verify(hateoasLinks, times(10)).links(any(UsuarioResponseDTO.class));
+        verify(assembler).toModel(any(Page.class));
     }
 
     @Test
@@ -126,6 +147,7 @@ class UsuarioServiceTest {
         when(repository.findByEmail(usuarioRequestMock.getEmail())).thenReturn(null);
         when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.of(usuarioEntidade));
         when(repository.save(any(Usuario.class))).thenReturn(usuarioEntidade);
+        when(modelMapper.map(any(Usuario.class), eq(UsuarioResponseDTO.class))).thenReturn(usuarioResponseMock);
         doCallRealMethod().when(hateoasLinks).links(any(UsuarioResponseDTO.class));
 
         UsuarioResponseDTO resposta = service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock);
@@ -136,6 +158,7 @@ class UsuarioServiceTest {
         verify(repository, atLeastOnce()).findById(usuarioRequestMock.getId());
         verify(repository, atLeastOnce()).save(any(Usuario.class));
         verify(hateoasLinks, times(1)).links(any(UsuarioResponseDTO.class));
+        verify(modelMapper, times(1)).map(any(Usuario.class), eq(UsuarioResponseDTO.class));
 
         links(resposta, "FindUserById", "/api/usuarios/1", "GET");
         links(resposta, "FindAllUsers", "/api/usuarios", "GET");
@@ -172,7 +195,7 @@ class UsuarioServiceTest {
             assertEquals("O email fornecido já está cadastrado na base de dados", ex1.getMessage());
             verify(repository, atLeastOnce()).findByEmail(usuarioRequestMock.getEmail());
 
-            Exception ex2 = assertThrows(EmailCannotBeDuplicatedException.class, () ->{
+            Exception ex2 = assertThrows(EmailCannotBeDuplicatedException.class, () -> {
                 service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock);
             });
 
@@ -182,16 +205,18 @@ class UsuarioServiceTest {
 
         @Test
         @DisplayName("Lança uma exceção UserNotFound se nenhum usuário for encontrado na busca")
-        @Disabled
         void lanca_uma_excecao_se_nenhum_usuario_for_encontrado() {
-            when(repository.findAll()).thenReturn(List.of());
+            Pageable pageble = PageRequest.of(0, 10);
+            Page<Usuario> page = Page.empty();
 
-           // Exception ex = assertThrows(NotFoundElementException.class, () ->
-                    //service.findAllUsers()
-            //);
+            when(repository.findAll(pageble)).thenReturn(page);
 
-          //  assertEquals("Nenhum usuário encontrada no banco de dados", ex.getMessage());
-            verify(repository, atLeastOnce()).findAll();
+            Exception ex = assertThrows(NotFoundElementException.class, () ->
+                    service.findAllUsers(pageble)
+            );
+
+            assertEquals("Nenhum usuário encontrada no banco de dados", ex.getMessage());
+            verify(repository, atLeastOnce()).findAll(pageble);
         }
 
         @Test
@@ -200,7 +225,7 @@ class UsuarioServiceTest {
             when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.empty());
 
             Exception ex1 = assertThrows(NotFoundElementException.class, () ->
-                service.findUserById(usuarioRequestMock.getId())
+                    service.findUserById(usuarioRequestMock.getId())
             );
 
             assertEquals("Usuário não encontrado", ex1.getMessage());

@@ -14,7 +14,7 @@ public class StubsUsuario {
         Usuario usuario = new Usuario();
         List<Usuario> usuarios = new ArrayList<>();
 
-        for (long i = 1L; i <= 3; i++) {
+        for (long i = 1L; i <= 10; i++) {
             usuario.setId(i);
             usuario.setNome("Nomes test " + i);
             usuario.setEmail("email@gmail.com " + i);
@@ -47,5 +47,15 @@ public class StubsUsuario {
         requestDTO.setSenha("senha123");
         requestDTO.setDataCadastro(LocalDate.now());
         return requestDTO;
+    }
+
+    public static UsuarioResponseDTO usuarioResponse(){
+        UsuarioResponseDTO responseDTO = new UsuarioResponseDTO();
+
+        responseDTO.setId(1L);
+        responseDTO.setNome("Nomes test");
+        responseDTO.setEmail("email@gmail.com");
+        responseDTO.setDataCadastro(LocalDate.now());
+        return responseDTO;
     }
 }

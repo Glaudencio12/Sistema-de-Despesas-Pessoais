@@ -32,9 +32,9 @@ public class UsuarioService {
     private final ModelMapper modelMapper;
     private final PagedResourcesAssembler<UsuarioResponseDTO> assembler;
 
-    public UsuarioService(UsuarioRepository repository, HateoasLinks links, ModelMapper modelMapper, PagedResourcesAssembler<UsuarioResponseDTO> assembler) {
+    public UsuarioService(UsuarioRepository repository, HateoasLinks linksHateoas, ModelMapper modelMapper, PagedResourcesAssembler<UsuarioResponseDTO> assembler) {
         this.repository = repository;
-        this.linksHateoas = links;
+        this.linksHateoas = linksHateoas;
         this.modelMapper = modelMapper;
         this.assembler = assembler;
     }

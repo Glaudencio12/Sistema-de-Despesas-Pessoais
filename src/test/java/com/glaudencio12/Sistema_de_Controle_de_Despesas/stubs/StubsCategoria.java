@@ -1,6 +1,7 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.CategoriaRequestDTO;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancamentoCategoria;
 
@@ -23,7 +24,7 @@ public class StubsCategoria {
         Categoria categoria = new Categoria();
         List<Categoria> categorias = new ArrayList<>();
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 10; i++) {
             categoria.setId(1L);
             categoria.setNome("Categoria teste");
             categoria.setTipo(TipoLancamentoCategoria.DESPESA);
@@ -43,6 +44,15 @@ public class StubsCategoria {
         requestDTO.setNome("Categoria teste");
         requestDTO.setTipo(TipoLancamentoCategoria.DESPESA);
         requestDTO.setUsuarioId(StubsUsuario.usuarioEntidade().getId());
+        return requestDTO;
+    }
+
+    public static CategoriaResponseDTO categoriaResponse(){
+        CategoriaResponseDTO requestDTO = new CategoriaResponseDTO();
+
+        requestDTO.setId(1L);
+        requestDTO.setNome("Categoria teste");
+        requestDTO.setTipo(TipoLancamentoCategoria.DESPESA);
         return requestDTO;
     }
 
