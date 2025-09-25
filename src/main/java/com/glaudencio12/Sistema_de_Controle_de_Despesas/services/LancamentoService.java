@@ -75,8 +75,7 @@ public class LancamentoService {
     public LancamentoResponseDTO findLaunchById(Long id) {
         logger.info("Buscando um lançamento com id {}", id);
         Lancamento lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new NotFoundElementException("Lançamento não encontrado"));
-        Lancamento salvo = lancamentoRepository.save(lancamento);
-        LancamentoResponseDTO dto = LancamentoMapper.toResponseDTO(salvo);
+        LancamentoResponseDTO dto = LancamentoMapper.toResponseDTO(lancamento);
         hateoasLinks.links(dto);
         return dto;
     }

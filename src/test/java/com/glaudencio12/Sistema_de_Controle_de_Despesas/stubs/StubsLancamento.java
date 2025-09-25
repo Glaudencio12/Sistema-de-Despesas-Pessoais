@@ -1,6 +1,7 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.LancamentoRequestDTO;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Lancamento;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancamentoCategoria;
 
@@ -37,11 +38,22 @@ public class StubsLancamento {
         return requestDTO;
     }
 
-    public List<Lancamento> lancamentoEntidadeList(){
+    public static LancamentoResponseDTO lancamentoResponseDTO() {
+        LancamentoResponseDTO responseDTO = new LancamentoResponseDTO();
+        responseDTO.setId(1L);
+        responseDTO.setDescricao("Compra de supermercado");
+        responseDTO.setValor(new BigDecimal("150.75"));
+        responseDTO.setTipo(TipoLancamentoCategoria.DESPESA);
+        responseDTO.setCategoria(StubsCategoria.categoriaEntidade().getNome());
+
+        return responseDTO;
+    }
+
+    public static List<Lancamento> lancamentoEntidadeList(){
         Lancamento lancamento = new Lancamento();
         List<Lancamento> lancamentos = new ArrayList<>();
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 10; i++) {
             lancamento.setId(1L);
             lancamento.setDescricao("Compra de supermercado");
             lancamento.setValor(new BigDecimal("150.75"));

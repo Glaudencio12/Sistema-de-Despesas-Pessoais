@@ -1,6 +1,7 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.utils;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.controllers.CategoriaController;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.controllers.LancamentoController;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.controllers.UsuarioController;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoResponseDTO;
@@ -22,9 +23,9 @@ public class HateoasLinks {
             dto1.add(linkTo(methodOn(UsuarioController.class).delete(dto1.getId())).withRel("DeleteUser").withTitle("Excluí usuário pelo seu ID").withType("DELETE"));
 
         } else if (dto instanceof LancamentoResponseDTO dto2){
-            dto2.add(linkTo(methodOn(UsuarioController.class).findById(dto2.getId())).withRel("FindLaunchById").withTitle("Busca um lançamento pelo seu ID").withType("GET"));
-            dto2.add(linkTo(methodOn(UsuarioController.class).findAll(null)).withRel("FindAllLaunchs").withTitle("Busca todos os lançamentos realizados").withType("GET"));
-            dto2.add(linkTo(methodOn(UsuarioController.class).create(null)).withRel("CreateLaunch").withTitle("Cadastra um novo lançamento com os dados passados via Body").withType("POST"));
+            dto2.add(linkTo(methodOn(LancamentoController.class).findById(dto2.getId())).withRel("FindLaunchById").withTitle("Busca um lançamento pelo seu ID").withType("GET"));
+            dto2.add(linkTo(methodOn(LancamentoController.class).findAll(null)).withRel("FindAllLaunchs").withTitle("Busca todos os lançamentos realizados").withType("GET"));
+            dto2.add(linkTo(methodOn(LancamentoController.class).create(null)).withRel("CreateLaunch").withTitle("Cadastra um novo lançamento com os dados passados via Body").withType("POST"));
 
         }else if (dto instanceof CategoriaResponseDTO dto3){
             dto3.add(linkTo(methodOn(CategoriaController.class).findById(dto3.getId())).withRel("FindCategoryById").withTitle("Busca uma categoria por id").withType("GET"));

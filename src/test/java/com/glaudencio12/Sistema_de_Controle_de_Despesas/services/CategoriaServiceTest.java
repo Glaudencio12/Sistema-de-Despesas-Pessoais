@@ -133,7 +133,7 @@ class CategoriaServiceTest {
 
     @Test
     @DisplayName("Deve buscar todas as categorias cadastradas")
-    void busca_todas_as_categorias() {
+    void busca_todas_as_categorias_cadastradas_usando_paginacao() {
         Pageable pageable = PageRequest.of(0,10);
         Page<Categoria> page = new PageImpl<>(categoriaList);
 

@@ -113,7 +113,7 @@ class UsuarioServiceTest {
 
     @Test
     @DisplayName("Busca todos os usuários cadastrados no banco")
-    void busca_todos_os_usuarios_cadastrados() {
+    void busca_todos_os_usuarios_cadastrados_usando_paginacao() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Usuario> page = new PageImpl<>(usuarioEntidadeList);
 
