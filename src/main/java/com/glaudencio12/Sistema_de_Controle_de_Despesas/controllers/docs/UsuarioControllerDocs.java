@@ -94,7 +94,16 @@ public interface UsuarioControllerDocs {
             }
     )
 
-    ResponseEntity<UsuarioResponseDTO> updatePatch(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id, @RequestBody Map<String, Object> campos);
+    ResponseEntity<UsuarioResponseDTO> updatePatch(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id,
+                                                   @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                           content = @Content(
+                                                                   examples = {
+                                                                           @ExampleObject(
+                                                                                   value = "{ \"nome\": \"Maria\" }"
+                                                                           )
+                                                                   }
+                                                           )
+                                                   ) @RequestBody Map<String, Object> campos);
 
     @Operation(summary = "Remove usuário", description = "Remove um usuário existente pelo ID", tags = { "Usuários" },
             responses = {
