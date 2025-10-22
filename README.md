@@ -166,7 +166,7 @@ MYSQL_ROOT_PASSWORD=senha_root_segura
 
 1. **Pull da imagem da aplicação:**
    ```bash
-   docker pull glaudencio123/despesas-pessoais:v1.1 .
+   docker pull glaudencio12/despesas-pessoais:v1.2 .
    ```
 
 2. **Execute com Docker Compose:**
