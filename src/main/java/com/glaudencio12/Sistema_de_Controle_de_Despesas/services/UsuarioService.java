@@ -15,6 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
@@ -24,19 +28,37 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class UsuarioService {
+public class UsuarioService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class.getName());
 
     private final UsuarioRepository repository;
     private final HateoasLinks linksHateoas;
     private final ModelMapper modelMapper;
     private final PagedResourcesAssembler<UsuarioResponseDTO> assembler;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository repository, HateoasLinks linksHateoas, ModelMapper modelMapper, PagedResourcesAssembler<UsuarioResponseDTO> assembler) {
+    public UsuarioService(
+            UsuarioRepository repository,
+            HateoasLinks linksHateoas,
+            ModelMapper modelMapper,
+            PagedResourcesAssembler<UsuarioResponseDTO> assembler,
+            PasswordEncoder passwordEncoder
+    ) {
         this.repository = repository;
         this.linksHateoas = linksHateoas;
         this.modelMapper = modelMapper;
         this.assembler = assembler;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Usuario usuario = repository.findByEmail(email);
+        if (usuario != null) {
+            return usuario;
+        }else {
+            throw new UsernameNotFoundException("Usuário com email " + email + " não encontrado");
+        }
     }
 
     public UsuarioResponseDTO createUser(UsuarioRequestDTO usuarioRequest) {
@@ -47,8 +69,12 @@ public class UsuarioService {
             throw new EmailCannotBeDuplicatedException("O email fornecido já está cadastrado na base de dados");
         } else {
             usuarioRequest.setDataCadastro(LocalDate.now());
-            Usuario entidade = repository.save(modelMapper.map(usuarioRequest, Usuario.class));
-            UsuarioResponseDTO dto = modelMapper.map(entidade, UsuarioResponseDTO.class);
+            usuarioRequest.setSenha(passwordEncoder.encode(usuarioRequest.getSenha()));
+
+            Usuario usuario = modelMapper.map(usuarioRequest, Usuario.class);
+            Usuario salvo = repository.save(usuario);
+
+            UsuarioResponseDTO dto = modelMapper.map(salvo, UsuarioResponseDTO.class);
             linksHateoas.links(dto);
             return dto;
         }

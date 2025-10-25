@@ -2,6 +2,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.handler;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.CategoryCannotBeDuplicateException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.InvalidJwtAuthenticationException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponse;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponseValidate;
@@ -49,5 +50,11 @@ public class CustomEntityResponseHandler{
     public final ResponseEntity<ExceptionResponse> handlerIllegalArgument(Exception e, WebRequest request){
         ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), e.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    public final ResponseEntity<ExceptionResponse> handlerTokenInvalid(Exception e, WebRequest request){
+        ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), e.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 }

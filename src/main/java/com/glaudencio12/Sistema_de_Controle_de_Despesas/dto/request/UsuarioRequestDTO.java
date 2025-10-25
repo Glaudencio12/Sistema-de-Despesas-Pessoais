@@ -28,4 +28,6 @@ public class UsuarioRequestDTO {
     @JsonProperty("data_cadastro")
     @Schema(hidden = true)
     private LocalDate dataCadastro;
+
+    private String papel;
 }

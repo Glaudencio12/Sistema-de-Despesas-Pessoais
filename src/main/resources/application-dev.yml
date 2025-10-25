@@ -20,3 +20,8 @@ management:
   endpoint:
     health:
       show-details: always
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET_KEY}
+      expire-length: 3600000
