@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/auth/")
-@Tag(name = "Login", description = "Esta seção possui o endpoint responsável pela autenticação do usuário.")
+@Tag(name = "Login", description = "Esta seção possui os endpoints respsonsáveis pela segurançã da aplicação.")
 public class AuthController implements AuthControllerDocs {
     private final AuthService authService;
 
@@ -20,9 +20,6 @@ public class AuthController implements AuthControllerDocs {
         this.authService = authService;
     }
 
-    /**
-    Recebe as credenciais do usuário para a realização da autenticação autenticação
-     */
     @PostMapping(
             value = "/login",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
@@ -34,9 +31,10 @@ public class AuthController implements AuthControllerDocs {
     }
 
     @PutMapping(
-            value = "/refresh/{username}",
+            value = "/refresh/{email}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
+    @Override
     public ResponseEntity<TokenDTO> refreshToken(@PathVariable("email") String email, @RequestHeader("Authorization") String refreshToken) {
         TokenDTO token = authService.refreshToken(email, refreshToken);
         return ResponseEntity.ok(token);

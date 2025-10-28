@@ -26,7 +26,8 @@ public interface LancamentoControllerDocs {
                             content = @Content(schema = @Schema(implementation = LancamentoResponseDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Categoria não encontrado", content = @Content),
-                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
@@ -38,7 +39,8 @@ public interface LancamentoControllerDocs {
                             content = @Content(schema = @Schema(implementation = LancamentoResponseDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content),
-                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
@@ -50,7 +52,8 @@ public interface LancamentoControllerDocs {
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = LancamentoResponseDTO.class)))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Lançamentos não encontrados", content = @Content),
-                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
@@ -63,4 +66,3 @@ public interface LancamentoControllerDocs {
             )Pageable pageable
     );
 }
-

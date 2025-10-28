@@ -16,8 +16,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 public interface CategoriaControllerDocs {
 
     @Operation(summary = "Cria uma categoria", description = "Cria uma nova categoria associada ao usuário.", tags = { "Categorias" },
@@ -25,7 +23,8 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "201", description = "Categoria registrada com sucesso",
                             content = @Content(schema = @Schema(implementation = CategoriaResponseDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
-                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "409", description = "Categoria duplicada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
@@ -37,7 +36,8 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "200", description = "Categoria encontrada com sucesso",
                             content = @Content(schema = @Schema(implementation = CategoriaResponseDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
-                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
@@ -49,7 +49,8 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "200", description = "Categorias encontradas com sucesso",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = CategoriaResponseDTO.class)))),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
-                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Nenhuma categoria encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
@@ -59,7 +60,7 @@ public interface CategoriaControllerDocs {
                     page = 0,
                     size = 12,
                     direction = Sort.Direction.ASC,
-                    sort = "data"
+                    sort = "nome"
             )Pageable pageable
     );
 
@@ -67,7 +68,8 @@ public interface CategoriaControllerDocs {
             responses = {
                     @ApiResponse(responseCode = "204", description = "Categoria excluída com sucesso", content = @Content),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
-                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content),
             }
