@@ -29,7 +29,13 @@ public class CategoriaService {
     private final ModelMapper modelMapper;
     private final PagedResourcesAssembler<CategoriaResponseDTO> assembler;
 
-    public CategoriaService(CategoriaRepository repository, UsuarioRepository usuarioRepository, HateoasLinks hateoasLinks, ModelMapper modelMapper, PagedResourcesAssembler<CategoriaResponseDTO> assembler) {
+    public CategoriaService(
+            CategoriaRepository repository,
+            UsuarioRepository usuarioRepository,
+            HateoasLinks hateoasLinks,
+            ModelMapper modelMapper,
+            PagedResourcesAssembler<CategoriaResponseDTO> assembler
+    ) {
         this.categoriaRepository = repository;
         this.usuarioRepository = usuarioRepository;
         this.hateoasLinks = hateoasLinks;

@@ -24,5 +24,5 @@ public interface AuthControllerDocs {
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
             }
     )
-    ResponseEntity<?> signin(@Valid @RequestBody LoginRequestDTO credenciais);
+    ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO credenciais);
 }

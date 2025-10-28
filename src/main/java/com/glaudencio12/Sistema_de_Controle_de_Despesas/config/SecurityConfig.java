@@ -61,15 +61,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authorizationHttpRequest -> authorizationHttpRequest
                                 .requestMatchers(
-                                        "/auth/signin",
-                                        "/auth/refresh/**",
-                                        "/auth/createUser",
+                                        "/api/auth/login",
+                                        "/api/auth/refresh/**",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
-                                        "/api/usuarios"
+                                        "/api/usuarios",
+                                        "/api/usuarios/**"
                                 ).permitAll()
-                                .requestMatchers("/api/lancamentos").authenticated()
-                                .requestMatchers("/api/categorias").authenticated()
+                                .requestMatchers("/api/lancamentos", "/api/lancamentos/**").authenticated()
+                                .requestMatchers("/api/categorias", "/api/categorias/**").authenticated()
                                 .requestMatchers("/users").denyAll()
                 )
                 .cors(Customizer.withDefaults())

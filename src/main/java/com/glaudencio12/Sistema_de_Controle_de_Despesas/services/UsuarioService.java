@@ -29,7 +29,8 @@ import java.util.Set;
 
 @Service
 public class UsuarioService implements UserDetailsService {
-    private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class.getName());
+
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class);
 
     private final UsuarioRepository repository;
     private final HateoasLinks linksHateoas;
@@ -54,35 +55,37 @@ public class UsuarioService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = repository.findByEmail(email);
-        if (usuario != null) {
-            return usuario;
-        }else {
+        if (usuario == null) {
+            logger.error("Falha na autenticação: usuário com email {} não encontrado", email);
             throw new UsernameNotFoundException("Usuário com email " + email + " não encontrado");
         }
+        return usuario;
     }
 
     public UsuarioResponseDTO createUser(UsuarioRequestDTO usuarioRequest) {
         logger.info("Iniciando cadastro de usuário com email: {}", usuarioRequest.getEmail());
-        Usuario usuarioCadastrado = repository.findByEmail(usuarioRequest.getEmail());
+        Usuario usuarioExistente = repository.findByEmail(usuarioRequest.getEmail());
 
-        if (usuarioCadastrado != null) {
+        if (usuarioExistente != null) {
             throw new EmailCannotBeDuplicatedException("O email fornecido já está cadastrado na base de dados");
-        } else {
-            usuarioRequest.setDataCadastro(LocalDate.now());
-            usuarioRequest.setSenha(passwordEncoder.encode(usuarioRequest.getSenha()));
-
-            Usuario usuario = modelMapper.map(usuarioRequest, Usuario.class);
-            Usuario salvo = repository.save(usuario);
-
-            UsuarioResponseDTO dto = modelMapper.map(salvo, UsuarioResponseDTO.class);
-            linksHateoas.links(dto);
-            return dto;
         }
+
+        usuarioRequest.setDataCadastro(LocalDate.now());
+        usuarioRequest.setSenha(passwordEncoder.encode(usuarioRequest.getSenha()));
+
+        Usuario usuario = modelMapper.map(usuarioRequest, Usuario.class);
+        Usuario salvo = repository.save(usuario);
+
+        UsuarioResponseDTO dto = modelMapper.map(salvo, UsuarioResponseDTO.class);
+        linksHateoas.links(dto);
+        return dto;
     }
 
     public UsuarioResponseDTO findUserById(Long id) {
         logger.info("Buscando usuário de ID: {}", id);
-        Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
+
         UsuarioResponseDTO dto = modelMapper.map(usuario, UsuarioResponseDTO.class);
         linksHateoas.links(dto);
         return dto;
@@ -91,54 +94,65 @@ public class UsuarioService implements UserDetailsService {
     public PagedModel<EntityModel<UsuarioResponseDTO>> findAllUsers(Pageable pageable) {
         logger.info("Buscando todos os usuários do banco");
         Page<Usuario> usuarios = repository.findAll(pageable);
+
         if (usuarios.isEmpty()) {
-            throw new NotFoundElementException("Nenhum usuário encontrada no banco de dados");
-        } else {
-            Page<UsuarioResponseDTO> usuarioResponse = usuarios.map(usuario -> {
-                var usuarioDTO = modelMapper.map(usuario, UsuarioResponseDTO.class);
-                linksHateoas.links(usuarioDTO);
-                return usuarioDTO;
-            });
-            return assembler.toModel(usuarioResponse);
+            throw new NotFoundElementException("Nenhum usuário encontrado no banco de dados");
         }
+
+        Page<UsuarioResponseDTO> usuarioResponse = usuarios.map(usuario -> {
+            UsuarioResponseDTO usuarioDTO = modelMapper.map(usuario, UsuarioResponseDTO.class);
+            linksHateoas.links(usuarioDTO);
+            return usuarioDTO;
+        });
+
+        return assembler.toModel(usuarioResponse);
     }
 
     public UsuarioResponseDTO updateUserById(Long id, UsuarioRequestDTO usuarioRequest) {
         logger.info("Atualizando os dados do usuário de id {}", id);
+
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
+
         Usuario emailUsuarioCadastrado = repository.findByEmail(usuarioRequest.getEmail());
-
-        if (emailUsuarioCadastrado != null) {
+        if (emailUsuarioCadastrado != null && !emailUsuarioCadastrado.getId().equals(id)) {
             throw new EmailCannotBeDuplicatedException("O email fornecido já está cadastrado na base de dados");
-        } else {
-            Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
-
-            usuario.setNome(usuarioRequest.getNome().trim());
-            usuario.setEmail(usuarioRequest.getEmail().trim());
-            usuario.setSenha(usuarioRequest.getSenha().trim());
-            UsuarioResponseDTO dto = modelMapper.map(repository.save(usuario), UsuarioResponseDTO.class);
-            linksHateoas.links(dto);
-            return dto;
         }
+
+        usuario.setNome(usuarioRequest.getNome().trim());
+        usuario.setEmail(usuarioRequest.getEmail().trim());
+        usuario.setSenha(passwordEncoder.encode(usuarioRequest.getSenha().trim()));
+
+        UsuarioResponseDTO dto = modelMapper.map(repository.save(usuario), UsuarioResponseDTO.class);
+        linksHateoas.links(dto);
+        return dto;
     }
 
     public UsuarioResponseDTO updateSpecificFields(Long id, Map<String, Object> campos) {
-        logger.info("Atualizando o campo {} do usuário", campos.keySet());
-        Usuario usuarioCadastrado = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
+        logger.info("Atualizando o campo(s) {} do usuário de ID {}", campos.keySet(), id);
+        Usuario usuarioCadastrado = repository.findById(id)
+                .orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
 
         Set<String> camposPermitidos = Set.of("nome", "email", "senha");
 
         for (String chave : campos.keySet()) {
             if (!camposPermitidos.contains(chave)) {
-                throw new IllegalArgumentException("Campo não pode ser atualizado, pois somente os seguintes campos podem: " + camposPermitidos);
+                throw new IllegalArgumentException("Campo '" + chave + "' não pode ser atualizado. Campos permitidos: " + camposPermitidos);
             }
         }
 
         campos.forEach((campo, valor) -> {
-            Field field = ReflectionUtils.findField(Usuario.class, campo);
             if (!(valor instanceof String) || ((String) valor).isEmpty()) {
-                throw new IllegalArgumentException("Campo " + field.getName() + " não pode ser atualizado, pois precisa ser do tipo String e não pode ser nulo");
+                throw new IllegalArgumentException("O campo '" + campo + "' precisa ser do tipo String e não pode ser vazio");
             }
+
+            Field field = ReflectionUtils.findField(Usuario.class, campo);
             field.setAccessible(true);
+
+            if (campo.equals("senha")) {
+                valor = passwordEncoder.encode((String) valor);
+            }
+
             ReflectionUtils.setField(field, usuarioCadastrado, valor);
         });
 
@@ -149,7 +163,8 @@ public class UsuarioService implements UserDetailsService {
 
     public void deleteUserById(Long id) {
         logger.info("Excluindo o usuário de id {} do banco de dados", id);
-        Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
         repository.delete(usuario);
     }
 }

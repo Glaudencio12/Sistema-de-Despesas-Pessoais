@@ -46,14 +46,7 @@ public class CategoriaController implements CategoriaControllerDocs {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    public ResponseEntity<PagedModel<EntityModel<CategoriaResponseDTO>>> findAll(
-            @PageableDefault(
-                    page = 0,
-                    size = 12,
-                    direction = Sort.Direction.ASC,
-                    sort = "data"
-            ) Pageable pageable
-    ){
+    public ResponseEntity<PagedModel<EntityModel<CategoriaResponseDTO>>> findAll(Pageable pageable){
         PagedModel<EntityModel<CategoriaResponseDTO>> categoriasResponse = service.findAllCategories(pageable);
         return ResponseEntity.ok(categoriasResponse);
     }

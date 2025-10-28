@@ -2,6 +2,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.loginUser.LoginRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.loginUser.TokenDTO;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.security.JwtTokenProvider;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class AuthService {
      * @throws BadCredentialsException Se a senha estiver incorreta
      * @throws UsernameNotFoundException Se o email não existir no banco
      */
-    public ResponseEntity<TokenDTO> signIn(LoginRequestDTO credenciais) {
+    public TokenDTO login(LoginRequestDTO credenciais) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -51,12 +52,22 @@ public class AuthService {
             throw new BadCredentialsException("Usuário inexistente ou senha inválida");
         }
 
-        var usuario = usuarioRepository.findByEmail(credenciais.getEmail());
+        Usuario usuario = usuarioRepository.findByEmail(credenciais.getEmail());
         if (usuario == null) {
             throw new UsernameNotFoundException("Email " + credenciais.getEmail() + " não encontrado");
         }
 
-        TokenDTO token = tokenProvider.createAcessToken(usuario.getEmail(), usuario.getPapel());
-        return ResponseEntity.ok(token);
+        return tokenProvider.createAccessToken(usuario.getEmail(), usuario.getPapel());
+    }
+
+    public TokenDTO refreshToken(String email, String refreshToken) {
+        Usuario usuario = usuarioRepository.findByEmail(email);
+        TokenDTO token;
+        if (usuario == null) {
+            throw new UsernameNotFoundException("Email " + email + " não encontrado");
+        } else {
+            token = tokenProvider.refreshToken(refreshToken);
+        }
+        return token;
     }
 }

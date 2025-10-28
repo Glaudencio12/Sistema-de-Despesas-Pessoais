@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.loginUser.TokenDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.InvalidJwtAuthenticationException;
+import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +54,7 @@ public class JwtTokenProvider {
      * @param validade Data de expiração do token
      * @return Token JWT de acesso
      */
-    public String getAcessoToken(String email, String papel, Date agora, Date validade) {
+    public String getAccessToken(String email, String papel, Date agora, Date validade) {
         String issueUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         return JWT.create()
                 .withClaim("papel", papel)
@@ -73,7 +74,7 @@ public class JwtTokenProvider {
      * @param agora Data atual (para cálculo da expiração)
      * @return Token JWT de atualização
      */
-    public String refreshToken(String email, String papel, Date agora) {
+    public String getRefreshToken(String email, String papel, Date agora) {
         Date validadeAtualizacao = new Date(agora.getTime() + (validadeMilissegundos * 3));
         return JWT.create()
                 .withClaim("papel", papel)
@@ -91,14 +92,40 @@ public class JwtTokenProvider {
      * @param papel Papel ou permissão do usuário
      * @return TokenDTO com dados do token e validade
      */
-    public TokenDTO createAcessToken(String email, String papel) {
+    public TokenDTO createAccessToken(String email, String papel) {
         Date agora = new Date();
         Date validade = new Date(agora.getTime() + validadeMilissegundos);
 
-        String tokenDeAcesso = getAcessoToken(email, papel, agora, validade);
-        String tokenDeAtualizacao = refreshToken(email, papel, agora);
+        String tokenDeAcesso = getAccessToken(email, papel, agora, validade);
+        String tokenDeAtualizacao = getRefreshToken(email, papel, agora);
 
         return new TokenDTO(email, true, agora, validade, tokenDeAcesso, tokenDeAtualizacao);
+    }
+
+
+    /**
+     * Cria um objeto TokenDTO contendo um novo token de acesso e um novo token de atualização.
+     * Define os tempos de emissão e expiração e retorna ambos os tokens juntos.
+     *
+     * @param refreshToken token de atualização fornecido na autenticação
+     * @return TokenDTO com dados do token e validade
+     */
+    public TokenDTO refreshToken(String refreshToken) {
+        String token;
+        if (StringUtils.isNotBlank(refreshToken) && refreshToken.startsWith("Bearer")) {
+            token = refreshToken.substring("Bearer ".length());
+        } else {
+            throw new InvalidJwtAuthenticationException("Refresh Token mal formado ou faltando o prefixo 'Bearer '.");
+        }
+
+        try {
+            DecodedJWT decodedJWT = decodedToken(token);
+            String email = decodedJWT.getSubject();
+            String papel = decodedJWT.getClaim("papel").asString();
+            return createAccessToken(email, papel);
+        } catch (Exception e) {
+            throw new InvalidJwtAuthenticationException("Refresh Token expirado ou inválido.");
+        }
     }
 
     /**
