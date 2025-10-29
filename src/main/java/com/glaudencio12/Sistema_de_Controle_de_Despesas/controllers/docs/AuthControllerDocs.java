@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 public interface AuthControllerDocs {
-    @Operation(summary = "Autentica o usuário", description = "Realiza a autenticação do usuário no sistema via email e senha, retornando o token de acesse",
+    @Operation(summary = "Autentica o usuário", description = "Realiza a autenticação do usuário no sistema via email e senha, retornando o token de acesso",
             tags = {"Login"},
             responses = {
                     @ApiResponse(responseCode = "200", description = "Usuário autenticado com sucesso",
                             content = @Content(schema = @Schema(implementation = TokenDTO.class))
                     ),
-                    @ApiResponse(responseCode = "400", description = "Requisição inválida (Dados ausentes ou malformados)", content = @Content),
+                    @ApiResponse(responseCode = "400", description = "Requisição inválida (Dados ausentes ou mal formados)", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Credenciais inválidas ou não autorizado", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)

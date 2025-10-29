@@ -1,5 +1,6 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.controllers.docs;
 
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.config.SecurityConfig;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.CategoriaRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -27,7 +29,8 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "409", description = "Categoria duplicada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<CategoriaResponseDTO> create(@RequestBody CategoriaRequestDTO categoriaRequest);
 
@@ -40,7 +43,8 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<CategoriaResponseDTO> findById(@Parameter(description = "ID da categoria", example = "1") @PathVariable("id") Long id);
 
@@ -53,7 +57,8 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Nenhuma categoria encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<PagedModel<EntityModel<CategoriaResponseDTO>>> findAll(
             @PageableDefault(
@@ -72,7 +77,8 @@ public interface CategoriaControllerDocs {
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content),
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<Void> delete(String nomeCategoria);
 }

@@ -1,5 +1,6 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.controllers.docs;
 
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.config.SecurityConfig;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.LancamentoRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -29,7 +31,8 @@ public interface LancamentoControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<LancamentoResponseDTO> create(@RequestBody LancamentoRequestDTO lancamento);
 
@@ -42,7 +45,8 @@ public interface LancamentoControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<LancamentoResponseDTO> findById(@Parameter(description = "ID do lançamento", example = "1") @PathVariable("id") Long id);
 
@@ -55,7 +59,8 @@ public interface LancamentoControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<PagedModel<EntityModel<LancamentoResponseDTO>>> findAll(
             @PageableDefault(

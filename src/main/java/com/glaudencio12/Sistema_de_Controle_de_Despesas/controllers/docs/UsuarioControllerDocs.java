@@ -1,5 +1,6 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.controllers.docs;
 
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.config.SecurityConfig;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 public interface UsuarioControllerDocs {
-    @Operation(summary = "Cria um novo usuário", description = "Cria um novo registro de usuário no sistema (Registro não requer autenticação)", tags = {"Usuários"},
+    @Operation(summary = "Cria um novo usuário", description = "Cria um novo registro de usuário no sistema", tags = {"Usuários"},
             responses = {
                     @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso",
                             content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))
@@ -43,7 +45,8 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<UsuarioResponseDTO> findById(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id);
 
@@ -57,7 +60,8 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<PagedModel<EntityModel<UsuarioResponseDTO>>> findAll(
             @PageableDefault(
@@ -79,7 +83,8 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content),
                     @ApiResponse(responseCode = "409", description = "Email duplicado", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<UsuarioResponseDTO> update(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id, @RequestBody UsuarioRequestDTO usuarioRequest);
 
@@ -93,7 +98,8 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content),
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<UsuarioResponseDTO> updatePatch(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id,
                                                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -114,7 +120,8 @@ public interface UsuarioControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content)
-            }
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     ResponseEntity<?> delete(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id);
 }

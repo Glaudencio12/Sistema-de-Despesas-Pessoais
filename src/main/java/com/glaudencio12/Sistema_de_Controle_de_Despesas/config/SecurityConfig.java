@@ -2,6 +2,8 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.config;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.security.JwtTokenFilter;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.security.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtTokenProvider tokenProvider;
+    public static final String SECURITY = "bearerAuth";
 
     public SecurityConfig(JwtTokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
@@ -64,11 +67,12 @@ public class SecurityConfig {
                                         "/api/auth/login",
                                         "/api/auth/refresh/**",
                                         "/swagger-ui/**",
+                                        "/swagger-ui.html",
                                         "/v3/api-docs/**",
-                                        "/api/usuarios",
-                                        "/api/usuarios/**"
+                                        "/api/usuarios/createUser"
                                 ).permitAll()
                                 .requestMatchers("/api/lancamentos", "/api/lancamentos/**").authenticated()
+                                .requestMatchers("/api/usuarios", "/api/usuarios/**").authenticated()
                                 .requestMatchers("/api/categorias", "/api/categorias/**").authenticated()
                                 .requestMatchers("/users").denyAll()
                 )
