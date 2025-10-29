@@ -315,19 +315,19 @@ JWT_SECRET_KEY=sua_chave_secreta_jwt_muito_segura_aqui
 | Método | Endpoint | Descrição | Status | Autenticação |
 |--------|----------|-----------|---------|--------------|
 | `POST` | `/api/auth/login` | Fazer login e obter token JWT | ✅ | ❌ |
-| `POST` | `/api/auth/refresh` | Renovar token de acesso | ❌ | ❌ |
+| `POST` | `/api/auth/refresh` | Renovar token de acesso | ✅ | ❌ |
 | `POST` | `/api/auth/logout` | Fazer logout | ❌ | ❌ |
 
 ### 👥 **Usuários (`/api/usuarios`)**
 
-| Método | Endpoint | Descrição | Status | Autenticação |
-|--------|----------|-----------|---------|--------------|
-| `POST` | `/api/usuarios` | Criar novo usuário | ✅ | ❌ |
-| `GET` | `/api/usuarios` | Listar todos os usuários | ✅ | ✅ |
-| `GET` | `/api/usuarios/{id}` | Buscar usuário por ID | ✅ | ✅ |
-| `PUT` | `/api/usuarios/{id}` | Atualizar usuário | ✅ | ✅ |
-| `PATCH` | `/api/usuarios/{id}` | Atualizar dados parcialmente | ✅ | ✅ |
-| `DELETE` | `/api/usuarios/{id}` | Deletar usuário | ✅ | ✅ |
+| Método | Endpoint                   | Descrição | Status | Autenticação |
+|--------|----------------------------|-----------|---------|--------------|
+| `POST` | `/api/usuarios/createUser` | Criar novo usuário | ✅ | ❌ |
+| `GET` | `/api/usuarios`            | Listar todos os usuários | ✅ | ✅ |
+| `GET` | `/api/usuarios/{id}`       | Buscar usuário por ID | ✅ | ✅ |
+| `PUT` | `/api/usuarios/{id}`       | Atualizar usuário | ✅ | ✅ |
+| `PATCH` | `/api/usuarios/{id}`       | Atualizar dados parcialmente | ✅ | ✅ |
+| `DELETE` | `/api/usuarios/{id}`       | Deletar usuário | ✅ | ✅ |
 
 ### 📂 **Categorias (`/api/categorias`)**
 
@@ -475,7 +475,7 @@ mvn test -Dtest=UsuarioServiceTest
 - ✅ **Sanitização de dados** de entrada
 - ✅ **Autenticação JWT** com tokens seguros
 - ✅ **Criptografia de senhas** com BCrypt
-- ✅ **Controle de acesso** baseado em papéis
+-  ❌ **Controle de acesso** baseado em papéis
 
 ### Exceções Personalizadas
 
@@ -484,6 +484,7 @@ mvn test -Dtest=UsuarioServiceTest
 - `CategoryCannotBeDuplicateException` - Categoria duplicada
 - `ValidationException` - Erros de validação
 - `InvalidJwtAuthenticationException` - Token JWT inválido
+- `InvalidTokenException` - Autenticação sem token
 
 ## 📊 Histórico de movimentações
 
