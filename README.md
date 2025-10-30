@@ -475,7 +475,7 @@ mvn test -Dtest=UsuarioServiceTest
 - ✅ **Sanitização de dados** de entrada
 - ✅ **Autenticação JWT** com tokens seguros
 - ✅ **Criptografia de senhas** com BCrypt
--  ❌ **Controle de acesso** baseado em papéis
+- ✅ **Controle de acesso** baseado em papéis
 
 ### Exceções Personalizadas
 
