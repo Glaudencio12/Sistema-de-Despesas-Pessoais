@@ -12,6 +12,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -32,6 +33,7 @@ public class UsuarioController implements UsuarioControllerDocs {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
     )
+    @PreAuthorize("hasRole('USER','ADMIN')")
     @Override
     public ResponseEntity<UsuarioResponseDTO> create(@RequestBody @Valid UsuarioRequestDTO usuario) {
         UsuarioResponseDTO usuarioResponse = service.createUser(usuario);
@@ -40,6 +42,7 @@ public class UsuarioController implements UsuarioControllerDocs {
 
     @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable("id") Long id) {
         UsuarioResponseDTO usuario = service.findUserById(id);
         return ResponseEntity.ok(usuario);
@@ -47,6 +50,7 @@ public class UsuarioController implements UsuarioControllerDocs {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PagedModel<EntityModel<UsuarioResponseDTO>>> findAll(Pageable pageable) {
         PagedModel<EntityModel<UsuarioResponseDTO>> usuarios = service.findAllUsers(pageable);
         return ResponseEntity.ok(usuarios);
@@ -58,6 +62,7 @@ public class UsuarioController implements UsuarioControllerDocs {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
     )
     @Override
+    @PreAuthorize("hasRole('USER','ADMIN')")
     public ResponseEntity<UsuarioResponseDTO> update(@PathVariable("id") Long id, @RequestBody @Valid UsuarioRequestDTO usuarioRequest) {
         UsuarioResponseDTO usuarioResponse = service.updateUserById(id, usuarioRequest);
         return ResponseEntity.ok(usuarioResponse);
@@ -69,6 +74,7 @@ public class UsuarioController implements UsuarioControllerDocs {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
     )
     @Override
+    @PreAuthorize("hasRole('USER','ADMIN')")
     public ResponseEntity<UsuarioResponseDTO> updatePatch(@PathVariable("id") Long id, @RequestBody Map<String, Object> usuarioRequest) {
         UsuarioResponseDTO usuarioResponse = service.updateSpecificFields(id, usuarioRequest);
         return ResponseEntity.ok(usuarioResponse);
@@ -77,6 +83,7 @@ public class UsuarioController implements UsuarioControllerDocs {
 
     @DeleteMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('USER','ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         service.deleteUserById(id);
         return ResponseEntity.noContent().build();

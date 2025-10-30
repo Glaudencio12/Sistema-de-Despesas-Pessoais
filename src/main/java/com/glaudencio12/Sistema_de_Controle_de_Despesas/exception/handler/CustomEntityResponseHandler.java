@@ -2,7 +2,7 @@ package com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.handler;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.CategoryCannotBeDuplicateException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.InvalidJwtAuthenticationException;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.InvalidTokenException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponse;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.execeptionResponse.ExceptionResponseValidate;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import org.springframework.security.access.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +53,19 @@ public class CustomEntityResponseHandler{
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    @ExceptionHandler(InvalidTokenException.class)
     public final ResponseEntity<ExceptionResponse> handlerTokenInvalid(Exception e, WebRequest request){
         ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), e.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public final ResponseEntity<ExceptionResponse> handlerPermission(WebRequest request){
+        ExceptionResponse response = new ExceptionResponse(
+                DataFormatada.data(),
+                "Acesso negado: você não tem permissão para acessar este recurso.",
+                request.getDescription(false)
+        );
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 }

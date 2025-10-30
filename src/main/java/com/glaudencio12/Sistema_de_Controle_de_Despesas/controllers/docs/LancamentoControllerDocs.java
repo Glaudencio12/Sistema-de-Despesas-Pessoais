@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface LancamentoControllerDocs {
 
-    @Operation(summary = "Registra um lançamento", description = "Registra uma operação de despesa ou receita", tags = { "Lançamentos" },
+    @Operation(summary = "Registra um lançamento - USER e ADMIN", description = "Registra uma operação de despesa ou receita", tags = { "Lançamentos" },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Lançamento registrado com sucesso",
                             content = @Content(schema = @Schema(implementation = LancamentoResponseDTO.class))),
@@ -36,7 +36,7 @@ public interface LancamentoControllerDocs {
     )
     ResponseEntity<LancamentoResponseDTO> create(@RequestBody LancamentoRequestDTO lancamento);
 
-    @Operation(summary = "Busca um lançamento", description = "Busca uma operação pelo ID", tags = { "Lançamentos" },
+    @Operation(summary = "Busca um lançamento - USER e ADMIN", description = "Busca uma operação pelo ID", tags = { "Lançamentos" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Lançamento encontrado com sucesso",
                             content = @Content(schema = @Schema(implementation = LancamentoResponseDTO.class))),
@@ -50,7 +50,7 @@ public interface LancamentoControllerDocs {
     )
     ResponseEntity<LancamentoResponseDTO> findById(@Parameter(description = "ID do lançamento", example = "1") @PathVariable("id") Long id);
 
-    @Operation(summary = "Busca todos os lançamentos", description = "Busca todos os lançamentos realizados", tags = { "Lançamentos" },
+    @Operation(summary = "Busca todos os lançamentos - USER e ADMIN", description = "Busca todos os lançamentos realizados", tags = { "Lançamentos" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Lançamentos encontrados com sucesso",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = LancamentoResponseDTO.class)))),

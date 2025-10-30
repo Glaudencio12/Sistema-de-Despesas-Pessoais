@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 public interface CategoriaControllerDocs {
 
-    @Operation(summary = "Cria uma categoria", description = "Cria uma nova categoria associada ao usuário.", tags = { "Categorias" },
+    @Operation(summary = "Cria uma categoria - USER E ADMIN", description = "Cria uma nova categoria associada ao usuário.", tags = { "Categorias" },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Categoria registrada com sucesso",
                             content = @Content(schema = @Schema(implementation = CategoriaResponseDTO.class))),
@@ -34,7 +34,7 @@ public interface CategoriaControllerDocs {
     )
     ResponseEntity<CategoriaResponseDTO> create(@RequestBody CategoriaRequestDTO categoriaRequest);
 
-    @Operation(summary = "Busca uma categoria", description = "Recupera os detalhes de uma categoria a partir do seu ID.", tags = { "Categorias" },
+    @Operation(summary = "Busca uma categoria - USER E ADMIN", description = "Recupera os detalhes de uma categoria a partir do seu ID.", tags = { "Categorias" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Categoria encontrada com sucesso",
                             content = @Content(schema = @Schema(implementation = CategoriaResponseDTO.class))),
@@ -48,7 +48,7 @@ public interface CategoriaControllerDocs {
     )
     ResponseEntity<CategoriaResponseDTO> findById(@Parameter(description = "ID da categoria", example = "1") @PathVariable("id") Long id);
 
-    @Operation(summary = "Lista todas as categorias", description = "Lista todas as categorias cadastradas pelo usuário.", tags = { "Categorias" },
+    @Operation(summary = "Lista todas as categorias - USER E ADMIN", description = "Lista todas as categorias cadastradas pelo usuário.", tags = { "Categorias" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Categorias encontradas com sucesso",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = CategoriaResponseDTO.class)))),
@@ -69,7 +69,7 @@ public interface CategoriaControllerDocs {
             )Pageable pageable
     );
 
-    @Operation(summary = "Exclui uma categoria", description = "Remove uma categoria a partir do seu ID.", tags = { "Categorias" },
+    @Operation(summary = "Exclui uma categoria - USER E ADMIN", description = "Remove uma categoria a partir do seu ID.", tags = { "Categorias" },
             responses = {
                     @ApiResponse(responseCode = "204", description = "Categoria excluída com sucesso", content = @Content),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),

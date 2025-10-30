@@ -12,6 +12,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -30,6 +31,7 @@ public class LancamentoController implements LancamentoControllerDocs {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
     )
     @Override
+    @PreAuthorize("hasRole('ADMIN','USER')")
     public ResponseEntity<LancamentoResponseDTO> create(@RequestBody @Valid LancamentoRequestDTO lancamento){
         LancamentoResponseDTO lancamentoResponse = service.createLaunch(lancamento);
         return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoResponse);
@@ -37,6 +39,7 @@ public class LancamentoController implements LancamentoControllerDocs {
 
     @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
+    @PreAuthorize("hasRole('USER','ADMIN')")
     public ResponseEntity<LancamentoResponseDTO> findById(@PathVariable("id") Long id){
         LancamentoResponseDTO lancamentoResponse = service.findLaunchById(id);
         return ResponseEntity.ok(lancamentoResponse);
@@ -44,6 +47,7 @@ public class LancamentoController implements LancamentoControllerDocs {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
+    @PreAuthorize("hasRole('USER','ADMIN')")
     public ResponseEntity<PagedModel<EntityModel<LancamentoResponseDTO>>> findAll(Pageable pageable){
         PagedModel<EntityModel<LancamentoResponseDTO>> lancamentosResponse = service.findAllLaunches(pageable);
         return ResponseEntity.ok(lancamentosResponse);
