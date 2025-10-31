@@ -26,7 +26,6 @@ public class AuthController implements AuthControllerDocs {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
     public ResponseEntity<TokenDTO> login(@Valid @RequestBody LoginRequestDTO credenciais) {
         TokenDTO token = authService.login(credenciais);
         return ResponseEntity.ok(token);
@@ -37,7 +36,6 @@ public class AuthController implements AuthControllerDocs {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
     public ResponseEntity<TokenDTO> refreshToken(@PathVariable("email") String email, @RequestHeader("Authorization") String refreshToken) {
         TokenDTO token = authService.refreshToken(email, refreshToken);
         return ResponseEntity.ok(token);

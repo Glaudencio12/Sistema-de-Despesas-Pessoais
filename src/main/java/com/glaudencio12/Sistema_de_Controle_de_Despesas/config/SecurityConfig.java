@@ -1,5 +1,7 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.config;
 
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.security.CustomAccessDeniedHandler;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.security.JwtAuthenticationEntryPoint;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.security.JwtTokenFilter;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.security.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -23,11 +25,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
     private final JwtTokenProvider tokenProvider;
+    private final JwtAuthenticationEntryPoint entryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
     public static final String SECURITY = "bearerAuth";
 
-    public SecurityConfig(JwtTokenProvider tokenProvider) {
+    public SecurityConfig(JwtTokenProvider tokenProvider, JwtAuthenticationEntryPoint entryPoint) {
         this.tokenProvider = tokenProvider;
+        this.entryPoint = entryPoint;
+        accessDeniedHandler = null;
     }
 
     /**
@@ -59,6 +66,10 @@ public class SecurityConfig {
         return httpSecurity
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(httpSecurityException -> {
+                    httpSecurityException.accessDeniedHandler(accessDeniedHandler);
+                    httpSecurityException.authenticationEntryPoint(entryPoint);
+                })
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
