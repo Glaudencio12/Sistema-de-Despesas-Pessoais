@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -81,11 +83,21 @@ public class LancamentoService {
     }
 
     public PagedModel<EntityModel<LancamentoResponseDTO>> findAllLaunches(Pageable pageable) {
-        logger.info("Buscando todos os lançamentos registrados");
-        Page<Lancamento> lancamentos = lancamentoRepository.findAll(pageable);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        logger.info("Buscando lançamentos do usuário autenticado: {}", email);
+
+        Usuario usuario = usuarioRepository.findByEmail(email);
+        if (usuario == null) {
+            throw  new NotFoundElementException("Usuário não encontrado");
+        }
+
+        Page<Lancamento> lancamentos = lancamentoRepository.findByUsuarioId(usuario.getId(), pageable);
+
         if (lancamentos.isEmpty()) {
-            throw new NotFoundElementException("Nenhum lançameto encontrado");
-        } else {
+            throw new NotFoundElementException("Nenhum lançamento encontrado para este usuário");
+        }else {
             Page<LancamentoResponseDTO> lancamentoResponse = lancamentos.map(lancamento -> {
                 var lancamentoDTO = LancamentoMapper.toResponseDTO(lancamento);
                 hateoasLinks.links(lancamentoDTO);

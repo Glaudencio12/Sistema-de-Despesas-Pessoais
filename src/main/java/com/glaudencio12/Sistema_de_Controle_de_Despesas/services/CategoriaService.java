@@ -5,6 +5,7 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaRe
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.CategoryCannotBeDuplicateException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.CategoriaRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
@@ -68,10 +71,19 @@ public class CategoriaService {
     }
 
     public PagedModel<EntityModel<CategoriaResponseDTO>> findAllCategories(Pageable pageable) {
-        logger.info("Buscando todas as categorias no banco");
-        Page<Categoria> categorias = categoriaRepository.findAll(pageable);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        logger.info("Buscando todas as categorias do usuário autenticado");
+
+        Usuario usuario = usuarioRepository.findByEmail(email);
+        if (usuario == null) {
+            throw new NotFoundElementException("Usuário não encontrado");
+        }
+
+        Page<Categoria> categorias = categoriaRepository.findByUsuarioId(usuario.getId(), pageable);
         if (categorias.isEmpty()) {
-            throw new NotFoundElementException("Nenhuma categoria encontrada");
+            throw new NotFoundElementException("Nenhuma categoria encontrada para este usuário");
         } else {
             Page<CategoriaResponseDTO> categoriaResponse = categorias.map(categoria -> {
                 var categoriaDTO = modelMapper.map(categoria, CategoriaResponseDTO.class);
