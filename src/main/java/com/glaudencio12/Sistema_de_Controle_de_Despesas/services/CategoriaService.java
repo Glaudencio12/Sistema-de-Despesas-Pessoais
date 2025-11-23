@@ -74,7 +74,7 @@ public class CategoriaService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        logger.info("Buscando todas as categorias do usuário autenticado");
+        logger.info("Buscando todas as categorias do usuário autenticado: {}", email);
 
         Usuario usuario = usuarioRepository.findByEmail(email);
         if (usuario == null) {

@@ -1,4 +1,4 @@
-package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
+package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.services;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.LancamentoRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoResponseDTO;
@@ -9,9 +9,10 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.CategoriaRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.LancamentoRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs.StubsCategoria;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs.StubsLancamento;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs.StubsUsuario;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.LancamentoService;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.stubs.StubsCategoria;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.stubs.StubsLancamento;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.stubs.StubsUsuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

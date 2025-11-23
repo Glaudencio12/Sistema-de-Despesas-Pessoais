@@ -33,7 +33,7 @@ public class UsuarioController implements UsuarioControllerDocs {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
     )
-    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Override
     public ResponseEntity<UsuarioResponseDTO> create(@RequestBody @Valid UsuarioRequestDTO usuario) {
         UsuarioResponseDTO usuarioResponse = service.createUser(usuario);
@@ -62,7 +62,7 @@ public class UsuarioController implements UsuarioControllerDocs {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
     )
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UsuarioResponseDTO> update(@PathVariable("id") Long id, @RequestBody @Valid UsuarioRequestDTO usuarioRequest) {
         UsuarioResponseDTO usuarioResponse = service.updateUserById(id, usuarioRequest);
         return ResponseEntity.ok(usuarioResponse);
@@ -74,7 +74,7 @@ public class UsuarioController implements UsuarioControllerDocs {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
     )
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UsuarioResponseDTO> updatePatch(@PathVariable("id") Long id, @RequestBody Map<String, Object> usuarioRequest) {
         UsuarioResponseDTO usuarioResponse = service.updateSpecificFields(id, usuarioRequest);
         return ResponseEntity.ok(usuarioResponse);
@@ -83,7 +83,7 @@ public class UsuarioController implements UsuarioControllerDocs {
 
     @DeleteMapping("/{id}")
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         service.deleteUserById(id);
         return ResponseEntity.noContent().build();

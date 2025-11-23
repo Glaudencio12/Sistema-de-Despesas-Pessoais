@@ -1,4 +1,4 @@
-package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
+package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.services;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.CategoriaRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaResponseDTO;
@@ -8,8 +8,10 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.CategoriaRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs.StubsCategoria;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs.StubsUsuario;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.CategoriaService;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.UsuarioService;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.stubs.StubsCategoria;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.stubs.StubsUsuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +27,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,10 +1,11 @@
-package com.glaudencio12.Sistema_de_Controle_de_Despesas.services;
+package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.services;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.EmailCannotBeDuplicatedException;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.exception.NotFoundElementException;
-import com.glaudencio12.Sistema_de_Controle_de_Despesas.stubs.StubsUsuario;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.services.UsuarioService;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.stubs.StubsUsuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.utils.HateoasLinks;

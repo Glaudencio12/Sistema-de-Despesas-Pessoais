@@ -31,7 +31,7 @@ public class CategoriaController implements CategoriaControllerDocs {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE}
     )
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CategoriaResponseDTO> create(@RequestBody @Valid CategoriaRequestDTO categoriaRequest){
         CategoriaResponseDTO categoriaResponse = service.createCategory(categoriaRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaResponse);
@@ -39,7 +39,7 @@ public class CategoriaController implements CategoriaControllerDocs {
 
     @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable("id") Long id){
         CategoriaResponseDTO categoriaResponse = service.findCategoryById(id);
         return ResponseEntity.ok(categoriaResponse);
@@ -47,7 +47,7 @@ public class CategoriaController implements CategoriaControllerDocs {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<PagedModel<EntityModel<CategoriaResponseDTO>>> findAll(Pageable pageable){
         PagedModel<EntityModel<CategoriaResponseDTO>> categoriasResponse = service.findAllCategories(pageable);
         return ResponseEntity.ok(categoriasResponse);
@@ -55,7 +55,7 @@ public class CategoriaController implements CategoriaControllerDocs {
 
     @DeleteMapping("/{nomeCategoria}")
     @Override
-    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable("nomeCategoria") String nomeCategoria){
         service.deleteCategoryByName(nomeCategoria);
         return ResponseEntity.noContent().build();
