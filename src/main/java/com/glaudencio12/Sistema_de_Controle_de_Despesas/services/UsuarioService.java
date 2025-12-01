@@ -168,3 +168,4 @@ public class UsuarioService implements UserDetailsService {
         repository.delete(usuario);
     }
 }
+
