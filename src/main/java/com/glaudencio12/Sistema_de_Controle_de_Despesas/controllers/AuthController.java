@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/auth/")
+@RequestMapping("api/auth")
 @Tag(name = "Login", description = "Esta seção possui os endpoints respsonsáveis pela segurançã da aplicação.")
 public class AuthController implements AuthControllerDocs {
     private final AuthService authService;
