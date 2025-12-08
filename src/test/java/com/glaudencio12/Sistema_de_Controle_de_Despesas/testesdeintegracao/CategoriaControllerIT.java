@@ -1,5 +1,6 @@
 package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesdeintegracao;
 
+import com.auth0.jwt.JWT;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.loginUser.LoginRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.CategoriaRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.greaterThan;
@@ -64,7 +66,7 @@ public class CategoriaControllerIT extends TestContainerMySQL {
                     .contentType(ContentType.JSON)
                     .body(new LoginRequestDTO("teste@email.com", "12345678"))
                 .when()
-                    .post("api/auth/login")
+                    .post("/api/auth/login")
                 .then()
                     .statusCode(200)
                     .extract()
@@ -192,7 +194,7 @@ public class CategoriaControllerIT extends TestContainerMySQL {
 
     @Test
     @Order(7)
-    void deve_retornar_excecao_quando_usuario_nao_possui_categorias() {
+    void deve_retornar_excecao_quando_usuario_nao_possuir_categorias() {
         categoriaRepository.deleteAll();
 
         RestAssured.given()

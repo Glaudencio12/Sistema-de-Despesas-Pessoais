@@ -1,4 +1,4 @@
-package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.services;
+package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.LancamentoRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.LancamentoResponseDTO;
@@ -31,6 +31,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +65,12 @@ class LancamentoServiceTest {
     @Mock
     CategoriaRepository categoriaRepository;
 
+    @Mock
+    Authentication authentication;
+
+    @Mock
+    SecurityContext securityContext;
+
     @InjectMocks
     LancamentoService service;
 
@@ -82,7 +91,7 @@ class LancamentoServiceTest {
         lancamentoList = StubsLancamento.lancamentoEntidadeList();
     }
 
-    public static void verificarLinks(LancamentoResponseDTO dto, String tipo, String rel, String href){
+    public static void verificarLinks(LancamentoResponseDTO dto, String tipo, String rel, String href) {
         assertTrue(dto.getLinks().stream().anyMatch(link ->
                 link.getType().equals(tipo) &&
                 link.getRel().value().equals(rel) &&
@@ -109,9 +118,9 @@ class LancamentoServiceTest {
         verify(lancamentoRepository, atLeastOnce()).save(any(Lancamento.class));
         verify(hateoasLinks, atLeastOnce()).links(any(LancamentoResponseDTO.class));
 
-        verificarLinks(resposta,"GET", "FindLaunchById", "/api/lancamentos/1");
-        verificarLinks(resposta,"GET", "FindAllLaunchs", "/api/lancamentos");
-        verificarLinks(resposta,"POST", "CreateLaunch", "/api/lancamentos");
+        verificarLinks(resposta, "GET", "FindLaunchById", "/api/lancamentos/1");
+        verificarLinks(resposta, "GET", "FindAllLaunchs", "/api/lancamentos");
+        verificarLinks(resposta, "POST", "CreateLaunch", "/api/lancamentos");
     }
 
     @Test
@@ -127,18 +136,29 @@ class LancamentoServiceTest {
         verify(lancamentoRepository, atLeastOnce()).findById(anyLong());
         verify(hateoasLinks, atLeastOnce()).links(any(LancamentoResponseDTO.class));
 
-        verificarLinks(resposta,"GET", "FindLaunchById", "/api/lancamentos/1");
-        verificarLinks(resposta,"GET", "FindAllLaunchs", "/api/lancamentos");
-        verificarLinks(resposta,"POST", "CreateLaunch", "/api/lancamentos");
+        verificarLinks(resposta, "GET", "FindLaunchById", "/api/lancamentos/1");
+        verificarLinks(resposta, "GET", "FindAllLaunchs", "/api/lancamentos");
+        verificarLinks(resposta, "POST", "CreateLaunch", "/api/lancamentos");
     }
 
     @Test
     @DisplayName("Deve buscar todos os lançamentos com paginação")
     void busca_todos_os_lacamentos_registrados_usando_paginacao() {
         Pageable pageable = PageRequest.of(0, 10);
+
+        when(authentication.getName()).thenReturn("email@teste.com");
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setEmail("email@teste.com");
+
+        when(usuarioRepository.findByEmail("email@teste.com")).thenReturn(usuario);
+
         Page<Lancamento> page = new PageImpl<>(lancamentoList);
 
-        when(lancamentoRepository.findAll(pageable)).thenReturn(page);
+        when(lancamentoRepository.findByUsuarioId(usuario.getId(), pageable)).thenReturn(page);
         when(modelMapper.map(any(Lancamento.class), eq(LancamentoResponseDTO.class))).thenReturn(lancamentoResponse);
         doNothing().when(hateoasLinks).links(any(LancamentoResponseDTO.class));
 
@@ -157,56 +177,85 @@ class LancamentoServiceTest {
 
         assertNotNull(resposta);
         assertEquals(10, resposta.getContent().size());
-        verify(lancamentoRepository).findAll(pageable);
         verify(hateoasLinks, times(10)).links(any(LancamentoResponseDTO.class));
         verify(modelMapper, times(10)).map(any(Lancamento.class), eq(LancamentoResponseDTO.class));
         verify(assembler).toModel(any(Page.class));
+        verify(lancamentoRepository).findByUsuarioId(usuario.getId(), pageable);
     }
 
     @Nested
     @DisplayName("Exceções de NotFound em Lançamento")
-    class LancamentoDeExcecaoNotFound{
+    class LancamentoDeExcecaoNotFound {
 
+        @DisplayName("Deve lançar exceção se o lançamento não for encontrado por ID")
         @Test
-        @DisplayName("Deve lançar exceção se o lançamento não for encontrado por ID, se não houver lançamentos cadastrados ou se o usuário não existir")
-        void lanca_excecao_se_o_lancamento_nao_for_encontrado(){
-            Pageable pageble = PageRequest.of(0, 10);
-            Page<Lancamento> page = Page.empty();
+        void deve_lancar_excecao_quando_buscar_por_id_e_nao_existir() {
 
-            when(lancamentoRepository.findById(anyLong())).thenReturn(Optional.empty());
-            when(usuarioRepository.findById(anyLong())).thenReturn(Optional.empty());
-            when(lancamentoRepository.findAll(pageble)).thenReturn(page);
+            when(lancamentoRepository.findById(1L)).thenReturn(Optional.empty());
 
-            Exception ex1 = assertThrows(NotFoundElementException.class, () ->
-                    service.findLaunchById(1L)
+            Exception ex = assertThrows(NotFoundElementException.class,
+                    () -> service.findLaunchById(1L)
             );
-            assertEquals("Lançamento não encontrado", ex1.getMessage());
-            verify(lancamentoRepository, atLeastOnce()).findById(anyLong());
 
-            Exception ex2 = assertThrows(NotFoundElementException.class, () ->
-                    service.findAllLaunches(pageble)
-            );
-            assertEquals("Nenhum lançameto encontrado", ex2.getMessage());
-            verify(lancamentoRepository, atLeastOnce()).findAll(pageble);
-
-            Exception ex3 = assertThrows(NotFoundElementException.class, () ->
-                    service.createLaunch(lancamentoRequest)
-            );
-            assertEquals("Usuário não encontrado", ex3.getMessage());
-            verify(usuarioRepository, atLeastOnce()).findById(anyLong());
+            assertEquals("Lançamento não encontrado", ex.getMessage());
+            verify(lancamentoRepository).findById(1L);
         }
 
+
+        @DisplayName("Deve lançar exceção se não houver lançamentos cadastrados para o usuário")
         @Test
-        @DisplayName("Deve lançar exceção se a categoria não for encontrada")
-        void lanca_excecao_se_a_categoria_nao_for_encontrada(){
-            when(usuarioRepository.findById(anyLong())).thenReturn(Optional.of(usuario));
-            when(categoriaRepository.findByNome(anyString())).thenReturn(null);
+        void deve_lancar_excecao_quando_buscar_todos_e_nao_houver_lancamentos() {
+
+            Pageable pageable = PageRequest.of(0, 10);
+
+            when(authentication.getName()).thenReturn("email@teste.com");
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            SecurityContextHolder.setContext(securityContext);
+
+            Usuario usuario = new Usuario();
+            usuario.setId(1L);
+            usuario.setEmail("email@teste.com");
+
+            when(usuarioRepository.findByEmail("email@teste.com")).thenReturn(usuario);
+            when(lancamentoRepository.findByUsuarioId(usuario.getId(), pageable)).thenReturn(Page.empty());
+
+            Exception ex = assertThrows(NotFoundElementException.class,
+                    () -> service.findAllLaunches(pageable)
+            );
+
+            assertEquals("Nenhum lançamento encontrado para este usuário", ex.getMessage());
+            verify(lancamentoRepository).findByUsuarioId(usuario.getId(), pageable);
+        }
+
+        @DisplayName("Deve lançar exceção ao criar lançamento se o usuário não existir")
+        @Test
+        void deve_lancar_excecao_ao_criar_lancamento_quando_usuario_nao_existe() {
+
+            when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
 
             Exception ex = assertThrows(NotFoundElementException.class, () ->
                     service.createLaunch(lancamentoRequest)
             );
-            assertEquals("Categoria não encontrada", ex.getMessage());
-            verify(categoriaRepository, atLeastOnce()).findByNome(anyString());
+
+            assertEquals("Usuário não encontrado", ex.getMessage());
+            verify(usuarioRepository).findById(1L);
         }
+
+
+        @Test
+        @DisplayName("Deve lançar exceção se a categoria não for encontrada")
+        void lanca_excecao_se_a_categoria_nao_for_encontrada() {
+
+            when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+            when(categoriaRepository.findByNome(categoria.getNome())).thenReturn(null);
+
+            Exception ex = assertThrows(NotFoundElementException.class, () ->
+                    service.createLaunch(lancamentoRequest)
+            );
+
+            assertEquals("Categoria não encontrada", ex.getMessage());
+            verify(categoriaRepository).findByNome(categoria.getNome());
+        }
+
     }
 }

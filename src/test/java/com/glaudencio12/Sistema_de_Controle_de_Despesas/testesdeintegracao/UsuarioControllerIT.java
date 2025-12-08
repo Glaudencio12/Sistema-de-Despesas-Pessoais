@@ -52,7 +52,7 @@ public class UsuarioControllerIT extends TestContainerMySQL{
                     .contentType(ContentType.JSON)
                     .body(new LoginRequestDTO("teste@email.com", "12345678"))
                 .when()
-                    .post("api/auth/login")
+                    .post("/api/auth/login")
                 .then()
                     .statusCode(200)
                 .extract()

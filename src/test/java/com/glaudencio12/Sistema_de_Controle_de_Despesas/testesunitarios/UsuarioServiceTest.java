@@ -1,4 +1,4 @@
-package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.services;
+package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.UsuarioRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.UsuarioResponseDTO;
@@ -19,6 +19,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +40,9 @@ class UsuarioServiceTest {
 
     @Mock
     ModelMapper modelMapper;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @Mock
     PagedResourcesAssembler<UsuarioResponseDTO> assembler;
@@ -70,23 +74,29 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("Simula o cadastro de um usuário no banco")
     void cria_um_usuario_no_banco() {
+
         when(repository.findByEmail(usuarioRequestMock.getEmail())).thenReturn(null);
-        when(repository.save(any(Usuario.class))).thenReturn(usuarioEntidade);
+        when(passwordEncoder.encode(usuarioRequestMock.getSenha())).thenReturn("senhaCodificada");
         when(modelMapper.map(any(UsuarioRequestDTO.class), eq(Usuario.class))).thenReturn(usuarioEntidade);
         when(modelMapper.map(any(Usuario.class), eq(UsuarioResponseDTO.class))).thenReturn(usuarioResponseMock);
+        when(repository.save(any(Usuario.class))).thenReturn(usuarioEntidade);
+
         doCallRealMethod().when(hateoasLinks).links(any(UsuarioResponseDTO.class));
 
         UsuarioResponseDTO resposta = service.createUser(usuarioRequestMock);
 
         assertNotNull(resposta);
         assertNotNull(resposta.getLinks());
+
         verify(repository, atLeastOnce()).findByEmail(usuarioRequestMock.getEmail());
+        verify(passwordEncoder, atLeastOnce()).encode(anyString());
         verify(repository, atLeastOnce()).save(any(Usuario.class));
         verify(hateoasLinks, times(1)).links(any(UsuarioResponseDTO.class));
         verify(modelMapper, times(1)).map(any(UsuarioRequestDTO.class), eq(Usuario.class));
         verify(modelMapper, times(1)).map(any(Usuario.class), eq(UsuarioResponseDTO.class));
-
     }
+
+
 
     @Test
     @DisplayName("Busca um usuário por ID")
@@ -107,7 +117,7 @@ class UsuarioServiceTest {
 
         links(resposta, "FindUserById", "/api/usuarios/1", "GET");
         links(resposta, "FindAllUsers", "/api/usuarios", "GET");
-        links(resposta, "CreateUser", "/api/usuarios", "POST");
+        links(resposta, "CreateUser", "/api/usuarios/createUser", "POST");
         links(resposta, "UpdateUserById", "/api/usuarios/1", "PUT");
         links(resposta, "DeleteUser", "/api/usuarios/1", "DELETE");
     }

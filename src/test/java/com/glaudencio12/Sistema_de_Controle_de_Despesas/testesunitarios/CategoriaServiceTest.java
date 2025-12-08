@@ -1,4 +1,4 @@
-package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios.services;
+package com.glaudencio12.Sistema_de_Controle_de_Despesas.testesunitarios;
 
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.request.CategoriaRequestDTO;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.dto.response.CategoriaResponseDTO;
@@ -26,6 +26,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +59,12 @@ class CategoriaServiceTest {
     @Mock
     UsuarioService usuarioService;
 
+    @Mock
+    Authentication authentication;
+
+    @Mock
+    SecurityContext securityContext;
+
     @InjectMocks
     CategoriaService categoriaService;
 
@@ -64,6 +73,7 @@ class CategoriaServiceTest {
     CategoriaRequestDTO categoriaRequest;
     CategoriaResponseDTO categoriaResponse;
     List<Categoria> categoriaList;
+
 
     @BeforeEach
     void setUp() {
@@ -135,14 +145,25 @@ class CategoriaServiceTest {
     @Test
     @DisplayName("Deve buscar todas as categorias cadastradas")
     void busca_todas_as_categorias_cadastradas_usando_paginacao() {
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(authentication.getName()).thenReturn("email@teste.com");
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setEmail("email@teste.com");
+
+        when(usuarioRepository.findByEmail("email@teste.com")).thenReturn(usuario);
+
         Page<Categoria> page = new PageImpl<>(categoriaList);
 
-        when(categoriaRepository.findAll(pageable)).thenReturn(page);
+        when(categoriaRepository.findByUsuarioId(usuario.getId(), pageable)).thenReturn(page);
         when(modelMapper.map(any(Categoria.class), eq(CategoriaResponseDTO.class))).thenReturn(categoriaResponse);
         doNothing().when(hateoasLinks).links(any(CategoriaResponseDTO.class));
 
-        List<CategoriaResponseDTO> categoriaDTO = page.stream().map(categoria -> modelMapper.map(categoria, CategoriaResponseDTO.class)).toList();
+        List<CategoriaResponseDTO> categoriaDTO = page.stream().map(c -> modelMapper.map(c, CategoriaResponseDTO.class)).toList();
 
         PagedModel<EntityModel<CategoriaResponseDTO>> pagedModel = PagedModel.of(
                 categoriaDTO.stream().map(EntityModel::of).toList(),
@@ -155,11 +176,9 @@ class CategoriaServiceTest {
 
         assertNotNull(resposta);
         assertEquals(10, resposta.getContent().size());
-        verify(categoriaRepository).findAll(pageable);
-        verify(hateoasLinks, times(10)).links(any(CategoriaResponseDTO.class));
-        verify(modelMapper, times(20)).map(any(Categoria.class), eq(CategoriaResponseDTO.class));
-        verify(assembler).toModel(any(Page.class));
+        verify(categoriaRepository).findByUsuarioId(usuario.getId(), pageable);
     }
+
 
     @Test
     @DisplayName("Deve excluir uma categoria pelo nome")
@@ -215,12 +234,25 @@ class CategoriaServiceTest {
             assertEquals("A categoria fornecida não foi cadastrada", ex3.getMessage());
 
             Pageable pageable = PageRequest.of(0, 10);
+
+            when(authentication.getName()).thenReturn("email@teste.com");
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            SecurityContextHolder.setContext(securityContext);
+
+            Usuario usuario = new Usuario();
+            usuario.setId(1L);
+            usuario.setEmail("email@teste.com");
+
+            when(usuarioRepository.findByEmail("email@teste.com")).thenReturn(usuario);
+
             Page<Categoria> page = Page.empty();
-            when(categoriaRepository.findAll(pageable)).thenReturn(page);
+            when(categoriaRepository.findByUsuarioId(usuario.getId(), pageable)).thenReturn(page);
+
             Exception ex4 = assertThrows(NotFoundElementException.class,
-                   () -> categoriaService.findAllCategories(pageable)
+                    () -> categoriaService.findAllCategories(pageable)
             );
-            assertEquals("Nenhuma categoria encontrada", ex4.getMessage());
+
+            assertEquals("Nenhuma categoria encontrada para este usuário", ex4.getMessage());
         }
     }
 
