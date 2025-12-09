@@ -173,7 +173,7 @@ class UsuarioServiceTest {
 
         links(resposta, "FindUserById", "/api/usuarios/1", "GET");
         links(resposta, "FindAllUsers", "/api/usuarios", "GET");
-        links(resposta, "CreateUser", "/api/usuarios", "POST");
+        links(resposta, "CreateUser", "/api/usuarios/createUser", "POST");
         links(resposta, "UpdateUserById", "/api/usuarios/1", "PUT");
         links(resposta, "DeleteUser", "/api/usuarios/1", "DELETE");
     }
@@ -191,69 +191,98 @@ class UsuarioServiceTest {
     }
 
     @Nested
-    @DisplayName("Retorna uma exceção UseNotFoundExcepion e EmailCannotBeDuplicateException")
+    @DisplayName("Testes de Exceções - Usuário")
     class ExceptionsUser {
 
         @Test
-        @DisplayName("Lança uma exceção EmailCannotBeDuplicateException se o email já estiver cadastrado no banco")
-        void lanca_excecao_se_o_email_estiver_duplicado() {
-            when(repository.findByEmail(usuarioRequestMock.getEmail())).thenReturn(usuarioEntidade);
+        @DisplayName("Lança EmailCannotBeDuplicatedException ao criar usuário com email duplicado")
+        void deve_lancar_excecao_ao_criar_usuario_com_email_duplicado() {
+            when(repository.findByEmail(usuarioRequestMock.getEmail()))
+                    .thenReturn(usuarioEntidade);
 
-            Exception ex1 = assertThrows(EmailCannotBeDuplicatedException.class, () -> {
-                service.createUser(usuarioRequestMock);
-            });
+            Exception ex = assertThrows(EmailCannotBeDuplicatedException.class,
+                    () -> service.createUser(usuarioRequestMock)
+            );
 
-            assertEquals("O email fornecido já está cadastrado na base de dados", ex1.getMessage());
-            verify(repository, atLeastOnce()).findByEmail(usuarioRequestMock.getEmail());
-
-            Exception ex2 = assertThrows(EmailCannotBeDuplicatedException.class, () -> {
-                service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock);
-            });
-
-            assertEquals("O email fornecido já está cadastrado na base de dados", ex2.getMessage());
+            assertEquals("O email fornecido já está cadastrado na base de dados", ex.getMessage());
             verify(repository, atLeastOnce()).findByEmail(usuarioRequestMock.getEmail());
         }
+        @Test
+        @DisplayName("Lança EmailCannotBeDuplicatedException ao atualizar usuário com email já existente")
+        void deve_lancar_excecao_ao_atualizar_usuario_com_email_duplicado() {
+            when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.of(usuarioEntidade));
+
+            Usuario outroUsuario = new Usuario();
+            outroUsuario.setId(999L);
+            outroUsuario.setEmail(usuarioRequestMock.getEmail());
+
+            when(repository.findByEmail(usuarioRequestMock.getEmail())).thenReturn(outroUsuario);
+
+            Exception ex = assertThrows(EmailCannotBeDuplicatedException.class,
+                    () -> service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock)
+            );
+
+            assertEquals("O email fornecido já está cadastrado na base de dados", ex.getMessage());
+
+            verify(repository).findById(usuarioRequestMock.getId());
+            verify(repository).findByEmail(usuarioRequestMock.getEmail());
+        }
+
 
         @Test
-        @DisplayName("Lança uma exceção UserNotFound se nenhum usuário for encontrado na busca")
-        void lanca_uma_excecao_se_nenhum_usuario_for_encontrado() {
-            Pageable pageble = PageRequest.of(0, 10);
+        @DisplayName("Lança NotFoundElementException ao buscar todos e não encontrar usuários")
+        void deve_lancar_excecao_quando_nao_encontrar_usuarios_na_busca() {
+            Pageable pageable = PageRequest.of(0, 10);
             Page<Usuario> page = Page.empty();
 
-            when(repository.findAll(pageble)).thenReturn(page);
+            when(repository.findAll(pageable)).thenReturn(page);
 
-            Exception ex = assertThrows(NotFoundElementException.class, () ->
-                    service.findAllUsers(pageble)
+            Exception ex = assertThrows(NotFoundElementException.class,
+                    () -> service.findAllUsers(pageable)
             );
 
-            assertEquals("Nenhum usuário encontrada no banco de dados", ex.getMessage());
-            verify(repository, atLeastOnce()).findAll(pageble);
+            assertEquals("Nenhum usuário encontrado no banco de dados", ex.getMessage());
+            verify(repository, atLeastOnce()).findAll(pageable);
         }
 
         @Test
-        @DisplayName("Lança uma exceção UserNotFound se o usuário especificado por ID não for encontrado")
-        void lanca_uma_excecao_se_o_usuario_nao_for_encontrado() {
+        @DisplayName("Lança NotFoundElementException ao buscar usuário por ID inexistente")
+        void deve_lancar_excecao_quando_usuario_nao_for_encontrado_por_id_na_busca() {
             when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.empty());
 
-            Exception ex1 = assertThrows(NotFoundElementException.class, () ->
-                    service.findUserById(usuarioRequestMock.getId())
+            Exception ex = assertThrows(NotFoundElementException.class,
+                    () -> service.findUserById(usuarioRequestMock.getId())
             );
 
-            assertEquals("Usuário não encontrado", ex1.getMessage());
+            assertEquals("Usuário não encontrado", ex.getMessage());
+            verify(repository, atLeastOnce()).findById(usuarioRequestMock.getId());
+        }
 
-            Exception ex2 = assertThrows(NotFoundElementException.class, () ->
-                    service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock)
+        @Test
+        @DisplayName("Lança NotFoundElementException ao tentar atualizar usuário inexistente")
+        void deve_lancar_excecao_quando_usuario_nao_for_encontrado_na_atualizacao() {
+            when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.empty());
+
+            Exception ex = assertThrows(NotFoundElementException.class,
+                    () -> service.updateUserById(usuarioRequestMock.getId(), usuarioRequestMock)
             );
 
-            assertEquals("Usuário não encontrado", ex2.getMessage());
+            assertEquals("Usuário não encontrado", ex.getMessage());
+            verify(repository, atLeastOnce()).findById(usuarioRequestMock.getId());
+        }
 
-            Exception ex3 = assertThrows(NotFoundElementException.class, () ->
-                    service.deleteUserById(usuarioRequestMock.getId())
+        @Test
+        @DisplayName("Lança NotFoundElementException ao tentar deletar usuário inexistente")
+        void deve_lancar_excecao_quando_usuario_nao_for_encontrado_na_exclusao() {
+            when(repository.findById(usuarioRequestMock.getId())).thenReturn(Optional.empty());
+
+            Exception ex = assertThrows(NotFoundElementException.class,
+                    () -> service.deleteUserById(usuarioRequestMock.getId())
             );
 
-            assertEquals("Usuário não encontrado", ex3.getMessage());
-
-            verify(repository, times(3)).findById(usuarioRequestMock.getId());
+            assertEquals("Usuário não encontrado", ex.getMessage());
+            verify(repository, atLeastOnce()).findById(usuarioRequestMock.getId());
         }
     }
+
 }

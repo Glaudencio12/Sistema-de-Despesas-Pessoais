@@ -111,8 +111,7 @@ public class UsuarioService implements UserDetailsService {
     public UsuarioResponseDTO updateUserById(Long id, UsuarioRequestDTO usuarioRequest) {
         logger.info("Atualizando os dados do usuário de id {}", id);
 
-        Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
+        Usuario usuario = repository.findById(id).orElseThrow(() -> new NotFoundElementException("Usuário não encontrado"));
 
         Usuario emailUsuarioCadastrado = repository.findByEmail(usuarioRequest.getEmail());
         if (emailUsuarioCadastrado != null && !emailUsuarioCadastrado.getId().equals(id)) {
