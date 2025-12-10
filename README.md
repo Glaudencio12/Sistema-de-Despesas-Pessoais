@@ -234,7 +234,7 @@ ACTUATOR_ENABLED=true
 
 1. **Pull da imagem da aplicação:**
    ```bash
-   docker pull glaudencio12/despesas-pessoais:v1.2 .
+   docker pull glaudencio12/despesas-pessoais:v1.3 .
    ```
 
 2. **Execute com Docker Compose:**
@@ -512,7 +512,7 @@ mvn test -Dtest=UsuarioServiceTest
 - [ ] **Relatórios e Dashboards** financeiros
 - [ ] **Notificações** de lançamentos
 - [ ] **Importação/Exportação** de dados (CSV, Excel)
-- [ ] **Testes de integração** completos
+- [✅] **Testes de integração** completos
 - [ ] **Cache** com Redis para performance
 - [ ] **Rate Limiting** para proteção da API
 - [✅] **Auditoria** de operações (logs de auditoria)
