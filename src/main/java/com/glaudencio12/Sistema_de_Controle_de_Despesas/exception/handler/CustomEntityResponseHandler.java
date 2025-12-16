@@ -58,14 +58,4 @@ public class CustomEntityResponseHandler{
         ExceptionResponse response = new ExceptionResponse(DataFormatada.data(), e.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public final ResponseEntity<ExceptionResponse> handlerPermission(WebRequest request){
-        ExceptionResponse response = new ExceptionResponse(
-                DataFormatada.data(),
-                "Acesso negado: você não tem permissão para acessar este recurso.",
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
-    }
 }

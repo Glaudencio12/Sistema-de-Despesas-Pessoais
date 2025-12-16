@@ -9,13 +9,13 @@ Sistema de Controle de Despesas é uma aplicação Spring Boot moderna e robusta
 
 ### **🔧 Framework Principal**
 - **Java 21** - Linguagem de programação
-- **Spring Boot 3.5.3** - Framework principal para desenvolvimento de aplicações Java
-- **Maven 3.9.9** - Gerenciamento de dependências e build
+- **Spring Boot 3.5.5** - Framework principal para desenvolvimento de aplicações Java
+- **Maven** - Gerenciamento de dependências e build
 
 ### **🗄️ Banco de Dados e Persistência**
 - **MySQL 9.0.1** - Sistema de gerenciamento de banco de dados relacional
 - **Spring Data JPA** - Camada de abstração para acesso a dados
-- **Flyway 11.7.2** - Ferramenta de migração de banco de dados
+- **Flyway** - Ferramenta de migração de banco de dados
 
 ### **🔐 Segurança e Autenticação**
 - **Spring Security** - Framework de segurança para aplicações Spring
@@ -37,6 +37,7 @@ Sistema de Controle de Despesas é uma aplicação Spring Boot moderna e robusta
 - **ModelMapper 3.2.0** - Mapeamento entre objetos DTO e entidades
 - **Jackson** - Serialização/deserialização JSON, XML e YAML
 - **DotEnv Java 3.0.0** - Gerenciamento de variáveis de ambiente
+- **Lombok** - Redução de boilerplate com anotações
 
 ### **🐳 Containerização e Orquestração**
 - **Docker** - Containerização da aplicação
@@ -45,6 +46,8 @@ Sistema de Controle de Despesas é uma aplicação Spring Boot moderna e robusta
 ### **🧪 Testes**
 - **JUnit 5** - Framework de testes unitários
 - **Mockito** - Framework de mocking para testes
+- **Testcontainers 1.21.3** - Testes de integração com containers Docker
+- **Rest Assured 5.5.6** - Framework para testes de API REST
 
 ## Estrutura do Projeto
 
@@ -70,19 +73,16 @@ Sistema_de_Controle_de_Despesas/
 │   │       ├── application-prod.yml       # Configuração ambiente de prod
 │   │       ├── db/migration/              # Migrações do banco (10 arquivos)
 │   │       └── META-INF/
-│   │           └── spring.factories       # Configurações do Spring
+│   │           └── spring.factories       # Configurações do Spring para o DotEnv
 │   └── test/
 │       └── java/com/glaudencio12/Sistema_de_Controle_de_Despesas/
-│           ├── services/                  # Testes de serviços (3 arquivos)
-│           ├── stubs/                     # Stubs para testes (3 arquivos)
+│           ├── testesdeintegracao/        # Testes de integração
+│           ├── testesunitarios/           # Testes unitários
 │           └── StartupTests.java          # Testes de inicialização
-├── target/                                # Diretório de build (gerado automaticamente)
 ├── Dockerfile                             # Configuração Docker
-├── compose.yaml                           # Docker Compose
+├── compose.yaml                           # Docker Compose (orquestração de serviços)
 ├── pom.xml                               # Dependências Maven
 ├── prometheus.yml                        # Configuração do Prometheus
-├── mvnw                                  # Maven Wrapper (Unix)
-├── mvnw.cmd                              # Maven Wrapper (Windows)
 └── README.md                             # Este arquivo
 ```
 
@@ -152,14 +152,17 @@ Sistema_de_Controle_de_Despesas/
 - **Logs estruturados** para debugging
 
 ### ✅ **Recursos Avançados**
-- **HATEOAS** para navegação da API
-- **Documentação OpenAPI** completa e interativa
+- **HATEOAS** para navegação da API com links relacionados
+- **Documentação OpenAPI** completa e interativa (Swagger UI)
 - **Tratamento de exceções** robusto e centralizado
 - **Mapeamento de objetos** com ModelMapper
 - **Validações de entrada** com Bean Validation
 - **Suporte a múltiplos formatos** (JSON, XML, YAML)
-- **Migração de banco** com Flyway
-- **Containerização** com Docker
+- **Migração de banco** com Flyway (10 migrações incluídas)
+- **Containerização** com Docker e Docker Compose
+- **Paginação** em endpoints de listagem
+- **Testes de integração** com Testcontainers
+- **Auditoria** com triggers no banco de dados
 
 ## Configuração e Instalação
 
@@ -207,13 +210,6 @@ MYSQL_ROOT_PASSWORD=senha_root_segura
 # CONFIGURAÇÕES DE SEGURANÇA JWT
 # ========================================
 JWT_SECRET_KEY=sua_chave_secreta_jwt_muito_segura_aqui
-JWT_EXPIRE_LENGTH=3600000
-
-# ========================================
-# CONFIGURAÇÕES DE MONITORAMENTO
-# ========================================
-PROMETHEUS_ENABLED=true
-ACTUATOR_ENABLED=true
 ```
 
 1 - **Configure o banco de dados:**
@@ -232,33 +228,32 @@ ACTUATOR_ENABLED=true
 
 ### Executando com Docker
 
-1. **Pull da imagem da aplicação:**
+1. **Execute com Docker Compose:**
    ```bash
-   docker pull glaudencio12/despesas-pessoais:v1.3 .
+   docker compose up -d
    ```
-
-2. **Execute com Docker Compose:**
+   
+   Ou, se preferir usar a sintaxe antiga:
    ```bash
    docker-compose up -d
    ```
 
-3. **Verifique os serviços:**
+2. **Verifique os serviços:**
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
-4. **Acesse a aplicação:**
+3. **Acesse a aplicação:**
     - API: `http://localhost:8080`
     - Swagger UI: `http://localhost:8080/swagger-ui.html`
     - Health Check: `http://localhost:8080/actuator/health`
     - Métricas: `http://localhost:8080/actuator/metrics`
-    - Prometheus: `http://localhost:9091`
 
 ## 🐳 Docker e Deployment
 
 ### Serviços Incluídos
 
-O `docker-compose.yml` inclui os seguintes serviços:
+O `compose.yaml` inclui os seguintes serviços:
 
 - **app**: Aplicação Spring Boot (porta 8080)
 - **db**: MySQL 9.0.1 (porta 3307)
@@ -268,25 +263,25 @@ O `docker-compose.yml` inclui os seguintes serviços:
 
 ```bash
 # Iniciar todos os serviços
-docker-compose up -d
+docker compose up -d
 
 # Parar todos os serviços
-docker-compose down
+docker compose down
 
 # Ver logs da aplicação
-docker-compose logs -f app
+docker compose logs -f app
 
 # Ver logs do banco de dados
-docker-compose logs -f db
+docker compose logs -f db
 
 # Ver logs do Prometheus
-docker-compose logs -f prometheus
+docker compose logs -f prometheus
 
 # Rebuild da aplicação
-docker-compose up --build app
+docker compose up --build app
 
 # Limpar volumes (CUIDADO: remove dados do banco)
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Variáveis de Ambiente Docker
@@ -334,20 +329,17 @@ JWT_SECRET_KEY=sua_chave_secreta_jwt_muito_segura_aqui
 | Método | Endpoint | Descrição | Status | Autenticação |
 |--------|----------|-----------|---------|--------------|
 | `POST` | `/api/categorias` | Criar nova categoria | ✅ | ✅ |
-| `GET` | `/api/categorias` | Listar todas as categorias | ✅ | ✅ |
+| `GET` | `/api/categorias` | Listar todas as categorias (paginado) | ✅ | ✅ |
 | `GET` | `/api/categorias/{id}` | Buscar categoria por ID | ✅ | ✅ |
-| `PUT` | `/api/categorias/{id}` | Atualizar categoria | ✅ | ✅ |
-| `DELETE` | `/api/categorias/{id}` | Deletar categoria | ✅ | ✅ |
+| `DELETE` | `/api/categorias/{nomeCategoria}` | Deletar categoria por nome | ✅ | ✅ |
 
 ### 💰 **Lançamentos (`/api/lancamentos`)**
 
 | Método | Endpoint | Descrição | Status | Autenticação |
 |--------|----------|-----------|---------|--------------|
 | `POST` | `/api/lancamentos` | Criar novo lançamento | ✅ | ✅ |
-| `GET` | `/api/lancamentos` | Listar todos os lançamentos | ✅ | ✅ |
+| `GET` | `/api/lancamentos` | Listar todos os lançamentos (paginado) | ✅ | ✅ |
 | `GET` | `/api/lancamentos/{id}` | Buscar lançamento por ID | ✅ | ✅ |
-| `PUT` | `/api/lancamentos/{id}` | Atualizar lançamento | ✅ | ✅ |
-| `DELETE` | `/api/lancamentos/{id}` | Deletar lançamento | ✅ | ✅ |
 
 ### 📊 **Monitoramento (`/actuator`)**
 
@@ -419,6 +411,12 @@ POST "http://localhost:8080/api/categorias" \
   }'
 ```
 
+**Deletar Categoria por Nome:**
+```bash
+DELETE "http://localhost:8080/api/categorias/Alimentação" \
+  "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
 #### 💰 **Lançamentos**
 
 **Criar Lançamento (com autenticação):**
@@ -447,22 +445,6 @@ GET "http://localhost:8080/actuator/health"
 GET "http://localhost:8080/actuator/metrics"
 ```
 
-## Testes
-
-### Executando Testes
-
-```bash
-# Executar todos os testes
-mvn test
-
-# Executar testes com cobertura (quando implementado)
-mvn test jacoco:report
-
-# Executar testes específicos
-mvn test -Dtest=UsuarioServiceTest
-
-```
-
 ## 🔒 Segurança e Validações
 
 ### Validações Implementadas
@@ -479,16 +461,14 @@ mvn test -Dtest=UsuarioServiceTest
 
 ### Exceções Personalizadas
 
-- `NotFoundException` - Recurso não encontrado
+- `NotFoundElementException` - Recurso não encontrado
 - `EmailCannotBeDuplicatedException` - Email duplicado
 - `CategoryCannotBeDuplicateException` - Categoria duplicada
-- `ValidationException` - Erros de validação
-- `InvalidJwtAuthenticationException` - Token JWT inválido
-- `InvalidTokenException` - Autenticação sem token
+- `ExceptionResponse` - Resposta padronizada de exceções
+- `ExceptionResponseValidate` - Resposta de erros de validação
+- `InvalidTokenException` - Token JWT inválido ou ausente
 
 ## 📊 Histórico de movimentações
-
-### Spring Boot Actuator
 
 ### Logs Estruturados
 
@@ -513,12 +493,9 @@ mvn test -Dtest=UsuarioServiceTest
 - [ ] **Notificações** de lançamentos
 - [ ] **Importação/Exportação** de dados (CSV, Excel)
 - [✅] **Testes de integração** completos
-- [ ] **Cache** com Redis para performance
 - [ ] **Rate Limiting** para proteção da API
 - [✅] **Auditoria** de operações (logs de auditoria)
-- [ ] **Backup automático** do banco de dados
 - [ ] **Interface web** para usuários finais
-- [ ] **API de relatórios** com filtros avançados
 
 ## Contribuição
 
