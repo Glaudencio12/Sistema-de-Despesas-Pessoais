@@ -173,7 +173,7 @@ class LancamentoServiceTest {
 
         when(assembler.toModel(any(Page.class))).thenReturn(pagedModel);
 
-        PagedModel<EntityModel<LancamentoResponseDTO>> resposta = service.findAllLaunches(pageable);
+        PagedModel<EntityModel<LancamentoResponseDTO>> resposta = service.findAllLaunchesPage(pageable);
 
         assertNotNull(resposta);
         assertEquals(10, resposta.getContent().size());
@@ -220,7 +220,7 @@ class LancamentoServiceTest {
             when(lancamentoRepository.findByUsuarioId(usuario.getId(), pageable)).thenReturn(Page.empty());
 
             Exception ex = assertThrows(NotFoundElementException.class,
-                    () -> service.findAllLaunches(pageable)
+                    () -> service.findAllLaunchesPage(pageable)
             );
 
             assertEquals("Nenhum lançamento encontrado para este usuário", ex.getMessage());

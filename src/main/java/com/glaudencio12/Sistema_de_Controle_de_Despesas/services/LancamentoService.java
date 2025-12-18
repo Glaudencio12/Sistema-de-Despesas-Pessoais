@@ -7,6 +7,7 @@ import com.glaudencio12.Sistema_de_Controle_de_Despesas.mapper.LancamentoMapper;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Categoria;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Lancamento;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.Usuario;
+import com.glaudencio12.Sistema_de_Controle_de_Despesas.models.enums.TipoLancamentoCategoria;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.CategoriaRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.LancamentoRepository;
 import com.glaudencio12.Sistema_de_Controle_de_Despesas.repository.UsuarioRepository;
@@ -24,7 +25,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LancamentoService {
@@ -82,18 +87,24 @@ public class LancamentoService {
         return dto;
     }
 
-    public PagedModel<EntityModel<LancamentoResponseDTO>> findAllLaunches(Pageable pageable) {
+    private Usuario authenticatedUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        logger.info("Buscando lançamentos do usuário autenticado: {}", email);
+        logger.info("Buscando dados do usuário autenticado no sistema: {}", email);
 
         Usuario usuario = usuarioRepository.findByEmail(email);
         if (usuario == null) {
             throw  new NotFoundElementException("Usuário não encontrado");
         }
 
-        Page<Lancamento> lancamentos = lancamentoRepository.findByUsuarioId(usuario.getId(), pageable);
+        logger.info("Usuário encontrado!");
+
+        return usuario;
+    }
+
+    public PagedModel<EntityModel<LancamentoResponseDTO>> findAllLaunchesPage(Pageable pageable) {
+        Page<Lancamento> lancamentos = lancamentoRepository.findByUsuarioId(authenticatedUser().getId(), pageable);
 
         if (lancamentos.isEmpty()) {
             throw new NotFoundElementException("Nenhum lançamento encontrado para este usuário");
@@ -105,5 +116,25 @@ public class LancamentoService {
             });
             return assembler.toModel(lancamentoResponse);
         }
+    }
+
+    public BigDecimal balanceExpenses() {
+        logger.info("Buscando lançamentos do usuário {} para cálculo de despesas", authenticatedUser().getEmail());
+
+        BigDecimal valorTotal = lancamentoRepository.sumValorByUsuarioIdAndTipo(authenticatedUser().getId(), TipoLancamentoCategoria.DESPESA);
+
+        logger.info("Saldo de despesas calculado com sucesso");
+
+        return valorTotal != null ? valorTotal : BigDecimal.ZERO;
+    }
+
+    public BigDecimal revenueBalance() {
+        logger.info("Buscando lançamentos do usuário {} para cálculo de receitas", authenticatedUser().getEmail());
+
+        BigDecimal valorTotal = lancamentoRepository.sumValorByUsuarioIdAndTipo(authenticatedUser().getId(), TipoLancamentoCategoria.RECEITA);
+
+        logger.info("Saldo de receitas calculado com sucesso");
+
+        return valorTotal != null ? valorTotal : BigDecimal.ZERO;
     }
 }

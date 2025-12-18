@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 
 @RestController
 @RequestMapping("/api/lancamentos")
@@ -49,7 +51,20 @@ public class LancamentoController implements LancamentoControllerDocs {
     @Override
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<PagedModel<EntityModel<LancamentoResponseDTO>>> findAll(Pageable pageable){
-        PagedModel<EntityModel<LancamentoResponseDTO>> lancamentosResponse = service.findAllLaunches(pageable);
+        PagedModel<EntityModel<LancamentoResponseDTO>> lancamentosResponse = service.findAllLaunchesPage(pageable);
         return ResponseEntity.ok(lancamentosResponse);
+    }
+
+    @GetMapping(value = "/despesaTotal", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
+    @Override
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public BigDecimal balanceExpenses() {
+        return service.balanceExpenses();
+    }
+
+    @GetMapping(value = "/receitaTotal", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public BigDecimal revenueBalance(){
+        return service.revenueBalance();
     }
 }

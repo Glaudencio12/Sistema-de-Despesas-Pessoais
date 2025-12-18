@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.math.BigDecimal;
+
 
 public interface LancamentoControllerDocs {
 
@@ -70,4 +72,17 @@ public interface LancamentoControllerDocs {
                     sort = "data"
             )Pageable pageable
     );
+
+    @Operation(summary = "Calcula o total de despesas - USER e ADMIN", description = "Soma todos os lançamentos do tipo DESPESA vinculados ao usuário autenticado", tags = { "Lançamentos" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Cálculo realizado com sucesso",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BigDecimal.class, example = "1250.50"))
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
+    )
+    public BigDecimal balanceExpenses();
 }
