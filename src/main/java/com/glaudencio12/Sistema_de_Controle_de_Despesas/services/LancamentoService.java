@@ -87,7 +87,7 @@ public class LancamentoService {
         return dto;
     }
 
-    private Usuario authenticatedUser(){
+    private Usuario authenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
@@ -95,7 +95,7 @@ public class LancamentoService {
 
         Usuario usuario = usuarioRepository.findByEmail(email);
         if (usuario == null) {
-            throw  new NotFoundElementException("Usuário não encontrado");
+            throw new NotFoundElementException("Usuário não encontrado");
         }
 
         logger.info("Usuário encontrado!");
@@ -108,7 +108,7 @@ public class LancamentoService {
 
         if (lancamentos.isEmpty()) {
             throw new NotFoundElementException("Nenhum lançamento encontrado para este usuário");
-        }else {
+        } else {
             Page<LancamentoResponseDTO> lancamentoResponse = lancamentos.map(lancamento -> {
                 var lancamentoDTO = LancamentoMapper.toResponseDTO(lancamento);
                 hateoasLinks.links(lancamentoDTO);

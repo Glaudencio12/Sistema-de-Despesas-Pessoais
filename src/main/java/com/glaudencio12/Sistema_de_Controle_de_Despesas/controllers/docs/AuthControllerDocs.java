@@ -14,10 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 public interface AuthControllerDocs {
-    @Operation(summary = "Autentica o usuário - USER e ADMIN", description = "Realiza a autenticação do usuário no sistema via email e senha, retornando o token de acesso",
+    @Operation(
+            summary = "Autentica o usuário - USER e ADMIN",
+            description = "Realiza a autenticação do usuário no sistema via email e senha, retornando o token de acesso",
             tags = {"Login"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Usuário autenticado com sucesso",
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Usuário autenticado com sucesso",
                             content = @Content(schema = @Schema(implementation = TokenDTO.class))
                     ),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida (Dados ausentes ou mal formados)", content = @Content),
@@ -28,10 +32,14 @@ public interface AuthControllerDocs {
     )
     ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO credenciais);
 
-    @Operation(summary = "Gera novos tokens - USER e ADMIN", description = "Gera um novo token de acesso e atualização a partir de um refresh token válido",
+    @Operation(
+            summary = "Gera novos tokens - USER e ADMIN",
+            description = "Gera um novo token de acesso e atualização a partir de um refresh token válido",
             tags = {"Login"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Tokens gerados com sucesso",
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Tokens gerados com sucesso",
                             content = @Content(schema = @Schema(implementation = TokenDTO.class))
                     ),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),

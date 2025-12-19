@@ -22,9 +22,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 public interface UsuarioControllerDocs {
-    @Operation(summary = "Cria um novo usuário - USER e ADMIN", description = "Cria um novo registro de usuário no sistema", tags = {"Usuários"},
+    @Operation(
+            summary = "Cria um novo usuário - USER e ADMIN",
+            description = "Cria um novo registro de usuário no sistema",
+            tags = {"Usuários"},
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso",
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Usuário criado com sucesso",
                             content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))
                     ),
                     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content),
@@ -35,9 +40,14 @@ public interface UsuarioControllerDocs {
     )
     ResponseEntity<UsuarioResponseDTO> create(@RequestBody UsuarioRequestDTO usuario);
 
-    @Operation(summary = "Busca usuário por ID - ADMIN", description = "Retorna os dados de um usuário específico", tags = {"Usuários"},
+    @Operation(
+            summary = "Busca usuário por ID - ADMIN",
+            description = "Retorna os dados de um usuário específico",
+            tags = {"Usuários"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Usuário encontrado",
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Usuário encontrado",
                             content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))
                     ),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
@@ -50,9 +60,14 @@ public interface UsuarioControllerDocs {
     )
     ResponseEntity<UsuarioResponseDTO> findById(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id);
 
-    @Operation(summary = "Lista todos os usuários - ADMIN", description = "Retorna uma lista com todos os usuários cadastrados", tags = {"Usuários"},
+    @Operation(
+            summary = "Lista todos os usuários - ADMIN",
+            description = "Retorna uma lista com todos os usuários cadastrados",
+            tags = {"Usuários"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso",
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Lista retornada com sucesso",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = UsuarioResponseDTO.class)))
                     ),
                     @ApiResponse(responseCode = "204", description = "Nenhum conteúdo", content = @Content),
@@ -72,9 +87,14 @@ public interface UsuarioControllerDocs {
             ) Pageable pageable
     );
 
-    @Operation(summary = "Atualiza usuário - USER e ADMIN", description = "Atualiza os dados de um usuário existente pelo ID", tags = {"Usuários"},
+    @Operation(
+            summary = "Atualiza usuário - USER e ADMIN",
+            description = "Atualiza os dados de um usuário existente pelo ID",
+            tags = {"Usuários"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso",
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Usuário atualizado com sucesso",
                             content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))
                     ),
                     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content),
@@ -88,9 +108,14 @@ public interface UsuarioControllerDocs {
     )
     ResponseEntity<UsuarioResponseDTO> update(@Parameter(description = "Id do usuário", example = "1") @PathVariable("id") Long id, @RequestBody UsuarioRequestDTO usuarioRequest);
 
-    @Operation(summary = "Atualiza um campo específico do usuário - USER e ADMIN", description = "Atualiza um dado específico de um usuário existente pelo ID", tags = {"Usuários"},
+    @Operation(
+            summary = "Atualiza um campo específico do usuário - USER e ADMIN",
+            description = "Atualiza um dado específico de um usuário existente pelo ID",
+            tags = {"Usuários"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso",
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Usuário atualizado com sucesso",
                             content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))
                     ),
                     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content),
@@ -112,7 +137,10 @@ public interface UsuarioControllerDocs {
                                                            )
                                                    ) @RequestBody Map<String, Object> campos);
 
-    @Operation(summary = "Remove usuário - USER E ADMIN", description = "Remove um usuário existente pelo ID", tags = {"Usuários"},
+    @Operation(
+            summary = "Remove usuário - USER E ADMIN",
+            description = "Remove um usuário existente pelo ID",
+            tags = {"Usuários"},
             responses = {
                     @ApiResponse(responseCode = "204", description = "Usuário removido com sucesso", content = @Content),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),

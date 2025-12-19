@@ -24,10 +24,16 @@ import java.math.BigDecimal;
 
 public interface LancamentoControllerDocs {
 
-    @Operation(summary = "Registra um lançamento - USER e ADMIN", description = "Registra uma operação de despesa ou receita", tags = { "Lançamentos" },
+    @Operation(
+            summary = "Registra um lançamento - USER e ADMIN",
+            description = "Registra uma operação de despesa ou receita",
+            tags = {"Lançamentos"},
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Lançamento registrado com sucesso",
-                            content = @Content(schema = @Schema(implementation = LancamentoResponseDTO.class))),
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Lançamento registrado com sucesso",
+                            content = @Content(schema = @Schema(implementation = LancamentoResponseDTO.class))
+                    ),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Categoria não encontrado", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
@@ -38,10 +44,16 @@ public interface LancamentoControllerDocs {
     )
     ResponseEntity<LancamentoResponseDTO> create(@RequestBody LancamentoRequestDTO lancamento);
 
-    @Operation(summary = "Busca um lançamento - USER e ADMIN", description = "Busca uma operação pelo ID", tags = { "Lançamentos" },
+    @Operation(
+            summary = "Busca um lançamento - USER e ADMIN",
+            description = "Busca uma operação pelo ID",
+            tags = {"Lançamentos"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Lançamento encontrado com sucesso",
-                            content = @Content(schema = @Schema(implementation = LancamentoResponseDTO.class))),
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Lançamento encontrado com sucesso",
+                            content = @Content(schema = @Schema(implementation = LancamentoResponseDTO.class))
+                    ),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
@@ -52,10 +64,16 @@ public interface LancamentoControllerDocs {
     )
     ResponseEntity<LancamentoResponseDTO> findById(@Parameter(description = "ID do lançamento", example = "1") @PathVariable("id") Long id);
 
-    @Operation(summary = "Busca todos os lançamentos - USER e ADMIN", description = "Busca todos os lançamentos realizados", tags = { "Lançamentos" },
+    @Operation(
+            summary = "Busca todos os lançamentos - USER e ADMIN",
+            description = "Busca todos os lançamentos realizados",
+            tags = {"Lançamentos"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Lançamentos encontrados com sucesso",
-                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = LancamentoResponseDTO.class)))),
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Lançamentos encontrados com sucesso",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = LancamentoResponseDTO.class)))
+                    ),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Lançamentos não encontrados", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
@@ -70,13 +88,18 @@ public interface LancamentoControllerDocs {
                     size = 12,
                     direction = Sort.Direction.ASC,
                     sort = "data"
-            )Pageable pageable
+            ) Pageable pageable
     );
 
-    @Operation(summary = "Calcula o total de despesas - USER e ADMIN", description = "Soma todos os lançamentos do tipo DESPESA vinculados ao usuário autenticado", tags = { "Lançamentos" },
+    @Operation(
+            summary = "Calcula o total de despesas - USER e ADMIN",
+            description = "Soma todos os lançamentos do tipo DESPESA vinculados ao usuário autenticado",
+            tags = {"Lançamentos"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Cálculo realizado com sucesso",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BigDecimal.class, example = "1250.50"))
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Cálculo realizado com sucesso",
+                            content = @Content(schema = @Schema(implementation = BigDecimal.class, example = "1250.50"))
                     ),
                     @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
@@ -85,4 +108,23 @@ public interface LancamentoControllerDocs {
             security = @SecurityRequirement(name = SecurityConfig.SECURITY)
     )
     public BigDecimal balanceExpenses();
+
+    @Operation(
+            summary = "Calcula a receita total - USER e ADMIN",
+            description = "Soma os lançamentos do tipo RECEITA vinculados ao usuário autenticado",
+            tags = {"Lançamentos"},
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Cálculo realizado com sucesso",
+                            content = @Content(schema = @Schema(implementation = BigDecimal.class, example = "1250.50"))
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado (Token ausente, inválido ou expirado)", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado (Token válido, mas sem permissão)", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
+            },
+            security = @SecurityRequirement(name = SecurityConfig.SECURITY)
+    )
+    public BigDecimal revenueBalance();
+
 }
